@@ -13,4 +13,10 @@ public class BitbucketPullRequestResponseValueRepositoryCommit {
     public void setHash(String hash) {
         Hash = hash;
     }
+    
+    @Override
+ 	public String toString() {
+ 		return new StringBuilder().append("Hash=").append(Hash)
+ 				.toString();
+ 	}
 }

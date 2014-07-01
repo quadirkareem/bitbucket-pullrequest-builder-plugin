@@ -41,6 +41,14 @@ public class BitbucketPullRequestResponseValueRepository {
     public void setCommit(BitbucketPullRequestResponseValueRepositoryCommit commit) {
         this.commit = commit;
     }
+    
+	@Override
+	public String toString() {
+		return new StringBuilder().append("repository=").append(repository)
+				.append(", branch=").append(branch).append(", commit=")
+				.append(commit).toString();
+	}
+	
 }
 
 
