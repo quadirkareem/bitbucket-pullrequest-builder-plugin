@@ -66,10 +66,11 @@ public class BitbucketBuilds {
 		} else {
 			buildUrl = rootUrl + build.getUrl();
 		}
-//		repository.deletePullRequestComment(cause.getPullRequestId(),
-//				cause.getBuildStartCommentId());
+		// repository.deletePullRequestComment(cause.getPullRequestId(),
+		// cause.getBuildStartCommentId());
 		repository.postFinishedComment(cause.getPullRequestId(),
-				cause.getSourceCommitHash(), cause.getDestinationCommitHash(), result == Result.SUCCESS, buildUrl);
+				cause.getSourceCommitHash(), cause.getDestinationCommitHash(),
+				result == Result.SUCCESS, buildUrl);
 	}
-	
+
 }

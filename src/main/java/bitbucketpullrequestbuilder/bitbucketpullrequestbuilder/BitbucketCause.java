@@ -27,15 +27,18 @@ public class BitbucketCause extends Cause {
 			String repositoryOwner, String repositoryName,
 			String pullRequestId, String destinationRepositoryOwner,
 			String destinationRepositoryName, String pullRequestTitle,
-			String sourceCommitHash, String destinationCommitHash, String buildStartCommentId) {
+			String sourceCommitHash, String destinationCommitHash,
+			String buildStartCommentId) {
 		logger.info("INIT: BitbucketCause(): sourceBranch=" + sourceBranch
 				+ ", targetBranch=" + targetBranch + ", repositoryOwner="
 				+ repositoryOwner + ", repositoryName=" + repositoryName
 				+ ", pullRequestId=" + pullRequestId
 				+ ", destinationRepositoryOwner=" + destinationRepositoryOwner
 				+ ", destinationRepositoryName=" + destinationRepositoryName
-				+ ", pullRequestTitle=" + pullRequestTitle + ", sourceCommitHash="
-				+ sourceCommitHash + ", destnationCommitHash=" + destinationCommitHash + ", buildStartCommentId=" + buildStartCommentId);
+				+ ", pullRequestTitle=" + pullRequestTitle
+				+ ", sourceCommitHash=" + sourceCommitHash
+				+ ", destnationCommitHash=" + destinationCommitHash
+				+ ", buildStartCommentId=" + buildStartCommentId);
 		this.sourceBranch = sourceBranch;
 		this.targetBranch = targetBranch;
 		this.repositoryOwner = repositoryOwner;
@@ -98,7 +101,7 @@ public class BitbucketCause extends Cause {
 		logger.info("BitbucketCause.getDestinationCommitHash()");
 		return destinationCommitHash;
 	}
-	
+
 	public String getBuildStartCommentId() {
 		logger.info("BitbucketCause.getBuildStartCommentId()");
 		return buildStartCommentId;

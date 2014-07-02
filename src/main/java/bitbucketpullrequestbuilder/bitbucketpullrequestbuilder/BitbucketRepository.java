@@ -10,7 +10,7 @@ import bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.BitbucketPullRequ
 import bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.bitbucket.BitbucketApiClient;
 import bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.bitbucket.BitbucketPullRequestComment;
 import bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.bitbucket.BitbucketPullRequestResponseValue;
-import bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.bitbucket.BitbucketPullRequestResponseValueRepository;
+import bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.bitbucket.BitbucketUser;
 
 /**
  * Created by nishio
@@ -21,28 +21,29 @@ public class BitbucketRepository {
 	public static final String BUILD_REQUEST_MARKER = "jenkins, please test";
 	public static final String MERGE_REQUEST_MARKER = "jenkins, please merge";
 	public static final String DECLINE_REQUEST_MARKER = "jenkins, please decline";
-	
+
 	public static final String BUILD_START_MARKER = "[*BuildStarted*] Source: %s Destination: %s \n\n :pensive: Please wait for build to finish";
 	public static final String BUILD_FINISH_MARKER = "[*BuildFinished*] Source: %s Destination: %s";
 	public static final String BUILD_FINISH_SENTENCE = BUILD_FINISH_MARKER
 			+ " \n\n **%s** - %s";
-	public static final String BUILD_SUCCESS_COMMENT = ":smiley: SUCCESS";
-	public static final String BUILD_FAILURE_COMMENT = ":rage: FAILURE";
+	public static final String BUILD_SUCCESS_COMMENT = ":smiley: **SUCCESS**";
+	public static final String BUILD_FAILURE_COMMENT = ":rage: **FAILURE**";
 
-
-	public static final String DECLINE_COMMENT = 
-			"[*MergeDeclined*] \n\n :lock: Pull Request Declined on request";
-	
 	public static final String MERGE_COMMIT_COMMENT = "Merged in %s (pull request #%s)";
 	public static final String MERGE_SUCCESS_MARKER = "[*MergeSuccess*]";
 	public static final String MERGE_SUCCESS_COMMENT = MERGE_SUCCESS_MARKER
-			+ " \n\n :lock: SUCCESS - Pull Request Merged on request";
+			+ " \n\n :lock: **SUCCESS** - Pull Request Merged on request";
 	public static final String MERGE_FAIL_MARKER = "[*MergeFailed*]";
 	public static final String MERGE_FAIL_COMMENT = MERGE_FAIL_MARKER
-			+ " \n\n :confounded: FAILURE - Error while trying to merge Pull Request \n\n %s";
+			+ " \n\n :confounded: **FAILURE** - Error while trying to merge Pull Request \n\n %s";
 	public static final String MERGE_NOT_ALLOWED_MARKER = "[*MergeNotAllowed*]";
 	public static final String MERGE_NOT_ALLOWED_COMMENT = MERGE_NOT_ALLOWED_MARKER
 			+ " \n\n %s does NOT have Merge permissions. Please contact Jenkins Admin for more information.";
+
+	public static final String DECLINE_COMMENT = "[*MergeDeclined*] \n\n :lock: Pull Request Declined on request";
+	public static final String DECLINE_NOT_ALLOWED_MARKER = "[*DeclineNotAllowed*]";
+	public static final String DECLINE_NOT_ALLOWED_COMMENT = DECLINE_NOT_ALLOWED_MARKER
+			+ " \n\n %s does NOT have Decline permissions. Please contact Jenkins Admin for more information.";
 
 	private String projectPath;
 	private BitbucketPullRequestsBuilder builder;
@@ -87,8 +88,10 @@ public class BitbucketRepository {
 		logger.info("BitbucketRepository.postBuildStartCommentTo(): pullRequestId="
 				+ pullRequest.getId());
 		String sourceCommit = pullRequest.getSource().getCommit().getHash();
-		String destinationCommit = pullRequest.getDestination().getCommit().getHash();
-		String comment = String.format(BUILD_START_MARKER, sourceCommit, destinationCommit);
+		String destinationCommit = pullRequest.getDestination().getCommit()
+				.getHash();
+		String comment = String.format(BUILD_START_MARKER, sourceCommit,
+				destinationCommit);
 		BitbucketPullRequestComment commentResponse = this.client
 				.postPullRequestComment(pullRequest.getId(), comment);
 		return commentResponse.getCommentId().toString();
@@ -105,28 +108,30 @@ public class BitbucketRepository {
 					.getPullRequest();
 			String destinationBranch = pullRequestValue.getDestination()
 					.getBranch().getName();
-			switch(operation) {
+			switch (operation) {
 			case BUILD:
 				if (destinationBranch != null
-				&& destinationBranch
-						.equalsIgnoreCase(projectDestinationBranch)) {
-			String commentId = postBuildStartCommentTo(pullRequestValue);
-			logger.info("BitbucketRepository.addFutureBuildTasks(): pullRequestCommentId="
-					+ commentId);
-			BitbucketCause cause = new BitbucketCause(pullRequestValue
-					.getSource().getBranch().getName(), destinationBranch,
-					pullRequestValue.getSource().getRepository()
-							.getOwnerName(), pullRequestValue.getSource()
-							.getRepository().getRepositoryName(),
-					pullRequestValue.getId(), pullRequestValue
-							.getDestination().getRepository()
-							.getOwnerName(), pullRequestValue
-							.getDestination().getRepository()
-							.getRepositoryName(),
-					pullRequestValue.getTitle(), pullRequestValue
-							.getSource().getCommit().getHash(), pullRequestValue
-							.getDestination().getCommit().getHash(), commentId);
-			this.builder.getTrigger().startJob(cause);
+						&& destinationBranch
+								.equalsIgnoreCase(projectDestinationBranch)) {
+					String commentId = postBuildStartCommentTo(pullRequestValue);
+					logger.info("BitbucketRepository.addFutureBuildTasks(): pullRequestCommentId="
+							+ commentId);
+					BitbucketCause cause = new BitbucketCause(pullRequestValue
+							.getSource().getBranch().getName(),
+							destinationBranch, pullRequestValue.getSource()
+									.getRepository().getOwnerName(),
+							pullRequestValue.getSource().getRepository()
+									.getRepositoryName(),
+							pullRequestValue.getId(), pullRequestValue
+									.getDestination().getRepository()
+									.getOwnerName(), pullRequestValue
+									.getDestination().getRepository()
+									.getRepositoryName(),
+							pullRequestValue.getTitle(), pullRequestValue
+									.getSource().getCommit().getHash(),
+							pullRequestValue.getDestination().getCommit()
+									.getHash(), commentId);
+					this.builder.getTrigger().startJob(cause);
 				}
 				break;
 			case MERGE:
@@ -136,7 +141,7 @@ public class BitbucketRepository {
 				this.declinePullRequest(pullRequestValue);
 				break;
 			}
- 
+
 		}
 	}
 
@@ -148,7 +153,7 @@ public class BitbucketRepository {
 		this.client.declinePullRequest(id);
 		this.client.postPullRequestComment(id, DECLINE_COMMENT);
 	}
-	
+
 	public void mergePullRequest(
 			BitbucketPullRequestResponseValue pullRequestValue) {
 		String id = pullRequestValue.getId();
@@ -156,9 +161,14 @@ public class BitbucketRepository {
 				.getName();
 		logger.info("BitbucketRepository.mergePullRequest(): pullRequestId="
 				+ id);
-		this.client.mergePullRequest(id,
+		String errorMessage = this.client.mergePullRequest(id,
 				String.format(MERGE_COMMIT_COMMENT, sourceBranch, id));
-		this.client.postPullRequestComment(id, MERGE_SUCCESS_COMMENT);
+		if (errorMessage == null) {
+			this.client.postPullRequestComment(id, MERGE_SUCCESS_COMMENT);
+		} else {
+			this.client.postPullRequestComment(id,
+					String.format(MERGE_FAIL_COMMENT, errorMessage));
+		}
 	}
 
 	public void deletePullRequestComment(String pullRequestId, String commentId) {
@@ -168,17 +178,17 @@ public class BitbucketRepository {
 	}
 
 	public void postFinishedComment(String pullRequestId, String sourceCommit,
-			String destinationCommit,
-			boolean success, String buildUrl) {
+			String destinationCommit, boolean success, String buildUrl) {
 		logger.info("BitbucketRepository.postFinishedComment(): pullRequestId="
-				+ pullRequestId + ", sourceCommit=" + sourceCommit + ", destinationCommit=" + destinationCommit + ", success=" + success
-				+ ", buildUrl=" + buildUrl);
+				+ pullRequestId + ", sourceCommit=" + sourceCommit
+				+ ", destinationCommit=" + destinationCommit + ", success="
+				+ success + ", buildUrl=" + buildUrl);
 		String message = BUILD_FAILURE_COMMENT;
 		if (success) {
 			message = BUILD_SUCCESS_COMMENT;
 		}
-		String comment = String.format(BUILD_FINISH_SENTENCE, sourceCommit, destinationCommit, message,
-				buildUrl);
+		String comment = String.format(BUILD_FINISH_SENTENCE, sourceCommit,
+				destinationCommit, message, buildUrl);
 
 		this.client.postPullRequestComment(pullRequestId, comment);
 	}
@@ -191,13 +201,13 @@ public class BitbucketRepository {
 		if (pullRequest.getState() != null
 				&& pullRequest.getState().equals("OPEN")) {
 			String sourceCommit = pullRequest.getSource().getCommit().getHash();
-			String destinationCommit = pullRequest.getDestination().getCommit().getHash();
+			String destinationCommit = pullRequest.getDestination().getCommit()
+					.getHash();
 			// String owner = destination.getRepository().getOwnerName();
 			// String repositoryName = destination.getRepository()
 			// .getRepositoryName();
-			String destinationBranch = pullRequest
-					.getDestination().getBranch().getName()
-					.toLowerCase();
+			String destinationBranch = pullRequest.getDestination().getBranch()
+					.getName().toLowerCase();
 			if (this.trigger.getTargetBranch().contains(destinationBranch)) {
 				String id = pullRequest.getId();
 
@@ -211,7 +221,7 @@ public class BitbucketRepository {
 				operation = Operation.BUILD;
 				if (comments != null) {
 					boolean mergeMarkerFound = false;
-					String mergeAuthor = null;
+					BitbucketUser mergeAuthor = null;
 					boolean successBuildsNotFound = true;
 					Collections.sort(comments);
 					Collections.reverse(comments);
@@ -227,9 +237,7 @@ public class BitbucketRepository {
 								&& content.contains(MERGE_REQUEST_MARKER
 										.toLowerCase())) {
 							mergeMarkerFound = true;
-							mergeAuthor = comment
-									.getBitbucketPullRequestCommentAuthor()
-									.getUsername();
+							mergeAuthor = comment.getAuthor();
 							continue;
 						}
 
@@ -240,14 +248,20 @@ public class BitbucketRepository {
 									.toLowerCase())) {
 								// merge only if merge marker found &&
 								// build finished && that too successfully
-								if (this.trigger.getAdmins().contains(
-										mergeAuthor)) {
+								if (this.trigger.getAdminsList()
+										.contains(
+												mergeAuthor.getUsername()
+														.toLowerCase())) {
 									operation = Operation.MERGE;
 								} else {
+									String mergeAuthorString = mergeAuthor
+											.getDisplayName().concat(" (")
+											.concat(mergeAuthor.getUsername())
+											.concat(")");
 									this.client.postPullRequestComment(id,
 											String.format(
 													MERGE_NOT_ALLOWED_COMMENT,
-													mergeAuthor));
+													mergeAuthorString));
 									operation = null;
 								}
 								successBuildsNotFound = false;
@@ -259,14 +273,31 @@ public class BitbucketRepository {
 							break;
 						} else if (content.contains(DECLINE_REQUEST_MARKER
 								.toLowerCase())) {
-							operation = Operation.DECLINE;
+							BitbucketUser declineAuthor = comment.getAuthor();
+							if (this.trigger.getAdminsList().contains(
+									declineAuthor.getUsername().toLowerCase())) {
+								operation = Operation.DECLINE;
+							} else {
+								String declineAuthorString = declineAuthor
+										.getDisplayName().concat(" (")
+										.concat(declineAuthor.getUsername())
+										.concat(")");
+								this.client.postPullRequestComment(id, String
+										.format(DECLINE_NOT_ALLOWED_COMMENT,
+												declineAuthorString));
+								operation = null;
+							}
 							break;
-						}
-						else if (content.contains(searchStartMarker)
+						} else if (content.contains(searchStartMarker)
 								|| content.contains(searchFinishMarker)
-								|| content.contains(MERGE_SUCCESS_MARKER.toLowerCase())
-								|| content.contains(MERGE_FAIL_MARKER.toLowerCase())
-								|| content.contains(MERGE_NOT_ALLOWED_MARKER.toLowerCase())) {
+								|| content.contains(MERGE_SUCCESS_MARKER
+										.toLowerCase())
+								|| content.contains(MERGE_FAIL_MARKER
+										.toLowerCase())
+								|| content.contains(MERGE_NOT_ALLOWED_MARKER
+										.toLowerCase())
+								|| content.contains(DECLINE_NOT_ALLOWED_MARKER
+										.toLowerCase())) {
 							operation = null;
 							break;
 						}
@@ -275,7 +306,9 @@ public class BitbucketRepository {
 						operation = null;
 						this.client.postPullRequestComment(id, String.format(
 								MERGE_FAIL_COMMENT,
-								"Could not find Successful Builds for Source: " + sourceCommit + " Destination: " + destinationCommit));
+								"Could not find Successful Builds for Source: "
+										+ sourceCommit + " Destination: "
+										+ destinationCommit));
 					}
 				}
 

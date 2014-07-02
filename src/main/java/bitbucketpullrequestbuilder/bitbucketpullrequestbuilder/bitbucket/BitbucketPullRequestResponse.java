@@ -1,11 +1,10 @@
 package bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.bitbucket;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Created by nishio

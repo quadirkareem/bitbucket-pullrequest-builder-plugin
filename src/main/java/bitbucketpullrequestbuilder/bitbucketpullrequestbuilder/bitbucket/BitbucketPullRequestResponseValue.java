@@ -1,7 +1,5 @@
 package bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.bitbucket;
 
-import java.util.Arrays;
-
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -15,12 +13,12 @@ public class BitbucketPullRequestResponseValue {
 	private String title;
 	private BitbucketPullRequestResponseValueRepository destination;
 	private String reason;
-	private String closedBy;
+	private BitbucketUser closedBy;
 	private BitbucketPullRequestResponseValueRepository source;
 	private String state;
 	private String createdOn;
 	private String updatedOn;
-	private String mergeCommit;
+	private BitbucketPullRequestResponseValueRepositoryCommit mergeCommit;
 	private String id;
 
 	public String getDescription() {
@@ -67,12 +65,12 @@ public class BitbucketPullRequestResponseValue {
 	}
 
 	@JsonProperty("closed_by")
-	public String getClosedBy() {
+	public BitbucketUser getClosedBy() {
 		return closedBy;
 	}
 
 	@JsonProperty("closed_by")
-	public void setClosedBy(String closedBy) {
+	public void setClosedBy(BitbucketUser closedBy) {
 		this.closedBy = closedBy;
 	}
 
@@ -113,12 +111,13 @@ public class BitbucketPullRequestResponseValue {
 	}
 
 	@JsonProperty("merge_commit")
-	public String getMergeCommit() {
+	public BitbucketPullRequestResponseValueRepositoryCommit getMergeCommit() {
 		return mergeCommit;
 	}
 
 	@JsonProperty("merge_commit")
-	public void setMergeCommit(String mergeCommit) {
+	public void setMergeCommit(
+			BitbucketPullRequestResponseValueRepositoryCommit mergeCommit) {
 		this.mergeCommit = mergeCommit;
 	}
 

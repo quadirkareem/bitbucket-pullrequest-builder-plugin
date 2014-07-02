@@ -1,9 +1,7 @@
 package bitbucketpullrequestbuilder.bitbucketpullrequestbuilder;
 
-import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
 import hudson.model.ParameterValue;
-import hudson.model.AbstractItem;
 import hudson.model.AbstractProject;
 import hudson.model.ParameterDefinition;
 import hudson.model.ParametersDefinitionProperty;

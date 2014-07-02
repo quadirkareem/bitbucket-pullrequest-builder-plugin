@@ -11,12 +11,13 @@ import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import net.sf.json.JSONObject;
 
@@ -31,6 +32,8 @@ import antlr.ANTLRException;
 public class BitbucketBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 	private static final Logger logger = Logger
 			.getLogger(BitbucketBuildTrigger.class.getName());
+	private static final Pattern DELIMITER_PATTERN = Pattern
+			.compile("(?s)[,;\\s]\\s*");
 	private final String projectPath;
 	private final String cron;
 	private final String username;
@@ -38,8 +41,9 @@ public class BitbucketBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 	private final String repositoryOwner;
 	private final String repositoryName;
 	private final String targetBranch;
-	private final Set<String> admins;
+	private final String admins;
 	private final String ciSkipPhrases;
+	private Set<String> adminsList;
 	transient private BitbucketPullRequestsBuilder bitbucketPullRequestsBuilder;
 
 	@Extension
@@ -48,16 +52,15 @@ public class BitbucketBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 	@DataBoundConstructor
 	public BitbucketBuildTrigger(String projectPath, String cron,
 			String username, String password, String repositoryOwner,
-			String repositoryName, String targetBranch, Set<String> admins,
+			String repositoryName, String targetBranch, String admins,
 			String ciSkipPhrases) throws ANTLRException {
 		super(cron);
 		logger.info("INIT: BitbucketBuildTrigger(): projectPath=" + projectPath
 				+ ", cron=" + cron + ", username=" + username + ", password="
 				+ password + ", repositoryOwner=" + repositoryOwner
 				+ ", repositoryName=" + repositoryName + ", targetBranch="
-				+ targetBranch + ", admins="
-				+ Arrays.toString(admins.toArray(new String[admins.size()]))
-				+ ", ciSkipPhrases=" + ciSkipPhrases);
+				+ targetBranch + ", admins=" + admins + ", ciSkipPhrases="
+				+ ciSkipPhrases);
 		this.projectPath = projectPath;
 		this.cron = cron.trim();
 		this.username = username.trim();
@@ -67,6 +70,7 @@ public class BitbucketBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 		this.targetBranch = targetBranch.trim().toLowerCase();
 		this.admins = admins;
 		this.ciSkipPhrases = ciSkipPhrases;
+		this.setAdminsList();
 	}
 
 	public String getProjectPath() {
@@ -104,14 +108,32 @@ public class BitbucketBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 		return targetBranch;
 	}
 
-	public Set<String> getAdmins() {
+	public String getAdmins() {
 		logger.info("BitbucketBuildTrigger.getAdmins()");
 		return admins;
+	}
+
+	public Set<String> getAdminsList() {
+		logger.info("BitbucketBuildTrigger.getAdminsList()");
+		return adminsList;
 	}
 
 	public String getCiSkipPhrases() {
 		logger.info("BitbucketBuildTrigger.getCiSkipPhrases()");
 		return ciSkipPhrases;
+	}
+
+	private void setAdminsList() {
+		logger.info("BitbucketBuildTrigger.setAdminsList()");
+		if (admins == null || admins.trim().length() == 0) {
+			adminsList = new HashSet<String>();
+		} else {
+			String[] users = DELIMITER_PATTERN.split(admins);
+			adminsList = new HashSet<String>(users.length);
+			for (String u : users) {
+				adminsList.add(u.trim().toLowerCase());
+			}
+		}
 	}
 
 	@Override

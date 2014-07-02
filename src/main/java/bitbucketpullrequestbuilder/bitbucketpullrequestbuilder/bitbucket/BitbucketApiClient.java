@@ -1,18 +1,26 @@
 package bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.bitbucket;
 
-import org.apache.commons.httpclient.*;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.apache.commons.httpclient.Credentials;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.methods.DeleteMethod;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonToken;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 
 /**
  * Created by nishio
@@ -23,6 +31,7 @@ public class BitbucketApiClient {
 	private static final String BITBUCKET_HOST = "bitbucket.org";
 	private static final String V1_API_BASE_URL = "https://bitbucket.org/api/1.0/repositories/";
 	private static final String V2_API_BASE_URL = "https://bitbucket.org/api/2.0/repositories/";
+	private final JsonFactory jsonFactory = new JsonFactory();
 	private String owner;
 	private String repositoryName;
 	private Credentials credentials;
@@ -66,18 +75,26 @@ public class BitbucketApiClient {
 		deleteRequest(path);
 	}
 
-	public void mergePullRequest(String pullRequestId, String message) {
+	public String mergePullRequest(String pullRequestId, String message) {
 		// https://bitbucket.org/api/2.0/repositories/{owner}/{repo_slug}/pullrequests/{id}/merge
 		String path = V2_API_BASE_URL + this.owner + "/" + this.repositoryName
 				+ "/pullrequests/" + pullRequestId + "/merge";
+		String errorMessage = null;
+		String response = null;
 		try {
 			NameValuePair content = new NameValuePair("message", message);
-			postRequest(path, new NameValuePair[] { content });
+			NameValuePair closeSourceBranch = new NameValuePair(
+					"close_source_branch", "true");
+			response = postRequest(path, new NameValuePair[] { content,
+					closeSourceBranch });
+			errorMessage = parseMergeResponseJson(response);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		return errorMessage;
 	}
 
 	public void declinePullRequest(String pullRequestId) {
@@ -189,5 +206,34 @@ public class BitbucketApiClient {
 		parsedResponse = mapper.readValue(response,
 				BitbucketPullRequestComment.class);
 		return parsedResponse;
+	}
+
+	private String parseMergeResponseJson(String response) throws IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		BitbucketPullRequestResponseValue parsedResponse;
+		parsedResponse = mapper.readValue(response,
+				BitbucketPullRequestResponseValue.class);
+		String errorMessage = null;
+		if (parsedResponse == null || parsedResponse.getId() == null) {
+			errorMessage = parseErrorMessageJson(response);
+		}
+		return errorMessage;
+	}
+
+	private String parseErrorMessageJson(String response) throws IOException {
+		String errorMessage = null;
+		JsonParser parser = jsonFactory.createJsonParser(response);
+		ObjectMapper mapper = new ObjectMapper();
+		while (parser.nextToken() != null) {
+			JsonToken token = parser.nextToken();
+			if (token != null) {
+				JsonNode root = ((JsonNode) mapper.readTree(parser))
+						.path("error");
+				errorMessage = root.path("fields").path("newstatus").path(0)
+						.asText();
+				break;
+			}
+		}
+		return errorMessage;
 	}
 }

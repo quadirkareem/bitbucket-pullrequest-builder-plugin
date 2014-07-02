@@ -3,8 +3,6 @@ package bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.bitbucket;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-import java.util.Comparator;
-
 /**
  * Created by nishio
  */
@@ -20,7 +18,7 @@ public class BitbucketPullRequestComment implements
 	private String content;
 	private String UtcCreatedOn;
 	private Boolean isSpam;
-	private BitbucketPullRequestCommentAuthor bitbucketPullRequestCommentAuthor;
+	private BitbucketUser author;
 
 	@JsonProperty("is_entity_author")
 	public Boolean getIsEntityAuthor() {
@@ -109,14 +107,13 @@ public class BitbucketPullRequestComment implements
 	}
 
 	@JsonProperty("author_info")
-	public BitbucketPullRequestCommentAuthor getBitbucketPullRequestCommentAuthor() {
-		return this.bitbucketPullRequestCommentAuthor;
+	public BitbucketUser getAuthor() {
+		return this.author;
 	}
 
 	@JsonProperty("author_info")
-	public void setBitbucketPullRequestCommentAuthor(
-			BitbucketPullRequestCommentAuthor bitbucketPullRequestCommentAuthor) {
-		this.bitbucketPullRequestCommentAuthor = bitbucketPullRequestCommentAuthor;
+	public void setAuthor(BitbucketUser author) {
+		this.author = author;
 	}
 
 	public int compareTo(BitbucketPullRequestComment target) {
@@ -138,9 +135,8 @@ public class BitbucketPullRequestComment implements
 				.append(", UtcLastUpdated=").append(UtcLastUpdated)
 				.append(", commentId=").append(commentId).append(", content=")
 				.append(content).append(", UtcCreatedOn=").append(UtcCreatedOn)
-				.append(", isSpam=").append(isSpam)
-				.append(", bitbucketPullRequestCommentAuthor=")
-				.append(bitbucketPullRequestCommentAuthor).toString();
+				.append(", isSpam=").append(isSpam).append(", author=")
+				.append(author).toString();
 	}
 
 }
