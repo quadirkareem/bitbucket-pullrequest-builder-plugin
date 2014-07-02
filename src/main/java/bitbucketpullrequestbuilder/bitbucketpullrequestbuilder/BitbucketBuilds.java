@@ -69,7 +69,7 @@ public class BitbucketBuilds {
 //		repository.deletePullRequestComment(cause.getPullRequestId(),
 //				cause.getBuildStartCommentId());
 		repository.postFinishedComment(cause.getPullRequestId(),
-				cause.getCommitHash(), result == Result.SUCCESS, buildUrl);
+				cause.getSourceCommitHash(), cause.getDestinationCommitHash(), result == Result.SUCCESS, buildUrl);
 	}
 	
 }
