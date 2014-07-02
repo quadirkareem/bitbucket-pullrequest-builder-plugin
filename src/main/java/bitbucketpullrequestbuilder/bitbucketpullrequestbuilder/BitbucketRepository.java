@@ -26,8 +26,8 @@ public class BitbucketRepository {
 	public static final String BUILD_FINISH_MARKER = "[*BuildFinished*] Source: %s Destination: %s";
 	public static final String BUILD_FINISH_SENTENCE = BUILD_FINISH_MARKER
 			+ " \n\n **%s** - %s";
-	public static final String BUILD_SUCCESS_COMMENT = ":smiley: **SUCCESS**";
-	public static final String BUILD_FAILURE_COMMENT = ":rage: **FAILURE**";
+	public static final String BUILD_SUCCESS_COMMENT = ":smiley: SUCCESS";
+	public static final String BUILD_FAILURE_COMMENT = ":rage: FAILURE";
 
 	public static final String MERGE_COMMIT_COMMENT = "Merged in %s (pull request #%s)";
 	public static final String MERGE_SUCCESS_MARKER = "[*MergeSuccess*]";
