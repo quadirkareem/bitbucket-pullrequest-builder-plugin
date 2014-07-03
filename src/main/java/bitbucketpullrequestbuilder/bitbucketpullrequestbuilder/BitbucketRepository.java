@@ -67,7 +67,8 @@ public class BitbucketRepository {
 
 	public Collection<BitbucketPullRequest> getTargetPullRequests() {
 		logger.info("BitbucketRepository.getTargetPullRequests()");
-		logger.info("Fetch PullRequests.");
+		logger.info("Fetch PullRequests for Destination Branch: "
+				+ this.trigger.getTargetBranch());
 		List<BitbucketPullRequestResponseValue> pullRequests = client
 				.getPullRequests();
 		List<BitbucketPullRequest> targetPullRequests = new ArrayList<BitbucketPullRequest>();
@@ -105,31 +106,28 @@ public class BitbucketRepository {
 			Operation operation = pullRequest.getOperation();
 			BitbucketPullRequestResponseValue pullRequestValue = pullRequest
 					.getPullRequest();
-			String destinationBranch = pullRequestValue.getDestination()
-					.getBranch().getName();
 			switch (operation) {
 			case BUILD:
-				if (destinationBranch != null) {
-					String commentId = postBuildStartCommentTo(pullRequestValue);
-					logger.info("BitbucketRepository.addFutureBuildTasks(): pullRequestCommentId="
-							+ commentId);
-					BitbucketCause cause = new BitbucketCause(pullRequestValue
-							.getSource().getBranch().getName(),
-							destinationBranch, pullRequestValue.getSource()
-									.getRepository().getOwnerName(),
-							pullRequestValue.getSource().getRepository()
-									.getRepositoryName(),
-							pullRequestValue.getId(), pullRequestValue
-									.getDestination().getRepository()
-									.getOwnerName(), pullRequestValue
-									.getDestination().getRepository()
-									.getRepositoryName(),
-							pullRequestValue.getTitle(), pullRequestValue
-									.getSource().getCommit().getHash(),
-							pullRequestValue.getDestination().getCommit()
-									.getHash(), commentId);
-					this.builder.getTrigger().startJob(cause);
-				}
+				String commentId = postBuildStartCommentTo(pullRequestValue);
+				logger.info("BitbucketRepository.addFutureBuildTasks(): pullRequestCommentId="
+						+ commentId);
+				BitbucketCause cause = new BitbucketCause(
+						pullRequestValue.getSource().getBranch().getName(),
+						pullRequestValue.getDestination().getBranch().getName(),
+						pullRequestValue.getSource().getRepository()
+								.getOwnerName(),
+						pullRequestValue.getSource().getRepository()
+								.getRepositoryName(),
+						pullRequestValue.getId(),
+						pullRequestValue.getDestination().getRepository()
+								.getOwnerName(),
+						pullRequestValue.getDestination().getRepository()
+								.getRepositoryName(),
+						pullRequestValue.getTitle(),
+						pullRequestValue.getSource().getCommit().getHash(),
+						pullRequestValue.getDestination().getCommit().getHash(),
+						commentId);
+				this.builder.getTrigger().startJob(cause);
 				break;
 			case MERGE:
 				this.mergePullRequest(pullRequestValue);
