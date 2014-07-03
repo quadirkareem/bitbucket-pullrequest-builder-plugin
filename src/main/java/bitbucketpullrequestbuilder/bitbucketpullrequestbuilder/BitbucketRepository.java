@@ -18,9 +18,9 @@ import bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.bitbucket.Bitbuck
 public class BitbucketRepository {
 	private static final Logger logger = Logger
 			.getLogger(BitbucketRepository.class.getName());
-	public static final String BUILD_REQUEST_MARKER = "jenkins, please test";
-	public static final String MERGE_REQUEST_MARKER = "jenkins, please merge";
-	public static final String DECLINE_REQUEST_MARKER = "jenkins, please decline";
+	public static final String BUILD_REQUEST_MARKER = "jenkins please retest";
+	public static final String MERGE_REQUEST_MARKER = "jenkins review complete please merge";
+	public static final String DECLINE_REQUEST_MARKER = "jenkins please decline";
 
 	public static final String BUILD_START_MARKER = "[*BuildStarted*] Source: %s Destination: %s \n\n :pensive: Please wait for build to finish";
 	public static final String BUILD_FINISH_MARKER = "[*BuildFinished*] Source: %s Destination: %s";
@@ -98,8 +98,7 @@ public class BitbucketRepository {
 	}
 
 	public void addFutureBuildTasks(
-			Collection<BitbucketPullRequest> pullRequests,
-			String projectDestinationBranch) {
+			Collection<BitbucketPullRequest> pullRequests) {
 		logger.info("BitbucketRepository.addFutureBuildTasks(): pullRequests size="
 				+ pullRequests.size());
 		for (BitbucketPullRequest pullRequest : pullRequests) {
@@ -110,9 +109,7 @@ public class BitbucketRepository {
 					.getBranch().getName();
 			switch (operation) {
 			case BUILD:
-				if (destinationBranch != null
-						&& destinationBranch
-								.equalsIgnoreCase(projectDestinationBranch)) {
+				if (destinationBranch != null) {
 					String commentId = postBuildStartCommentTo(pullRequestValue);
 					logger.info("BitbucketRepository.addFutureBuildTasks(): pullRequestCommentId="
 							+ commentId);
@@ -141,7 +138,6 @@ public class BitbucketRepository {
 				this.declinePullRequest(pullRequestValue);
 				break;
 			}
-
 		}
 	}
 

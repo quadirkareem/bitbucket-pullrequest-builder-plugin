@@ -39,7 +39,7 @@ public class BitbucketPullRequestsBuilder {
 		logProjectProperties();
 		Collection<BitbucketPullRequest> targetPullRequests = this.repository
 				.getTargetPullRequests();
-		this.repository.addFutureBuildTasks(targetPullRequests, "integration");
+		this.repository.addFutureBuildTasks(targetPullRequests);
 	}
 
 	private void logProjectProperties() {
