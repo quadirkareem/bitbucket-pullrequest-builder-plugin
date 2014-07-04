@@ -225,11 +225,11 @@ public class BitbucketRepository {
 						if (content == null || content.isEmpty()) {
 							continue;
 						}
-						content = content.toLowerCase();
+						content = content.toLowerCase().trim();
 
 						if (!mergeMarkerFound
-								&& content.contains(MERGE_REQUEST_MARKER
-										.toLowerCase())) {
+								&& MERGE_REQUEST_MARKER
+										.equalsIgnoreCase(content)) {
 							mergeMarkerFound = true;
 							mergeAuthor = comment.getAuthor();
 							continue;
@@ -261,12 +261,12 @@ public class BitbucketRepository {
 								successBuildsNotFound = false;
 								break;
 							}
-						} else if (content.contains(BUILD_REQUEST_MARKER
-								.toLowerCase())) {
+						} else if (BUILD_REQUEST_MARKER
+								.equalsIgnoreCase(content)) {
 							operation = Operation.BUILD;
 							break;
-						} else if (content.contains(DECLINE_REQUEST_MARKER
-								.toLowerCase())) {
+						} else if (DECLINE_REQUEST_MARKER
+								.equalsIgnoreCase(content)) {
 							BitbucketUser declineAuthor = comment.getAuthor();
 							if (this.trigger.getAdminsList().contains(
 									declineAuthor.getUsername().toLowerCase())) {
