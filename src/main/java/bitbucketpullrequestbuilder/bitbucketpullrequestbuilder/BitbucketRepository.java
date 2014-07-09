@@ -43,8 +43,9 @@ public class BitbucketRepository {
 	private static final String MERGE_COMMIT_COMMENT = "Merged in %s (pull request #%s)";
 
 	private static final String MERGE_SUCCESS_PREFIX = "## :lock: Merge Success";
-	private static final String MERGE_SUCCESS_PREFIX_LOWER = MERGE_SUCCESS_PREFIX
-			.toLowerCase();
+	// private static final String MERGE_SUCCESS_PREFIX_LOWER =
+	// MERGE_SUCCESS_PREFIX
+	// .toLowerCase();
 	private static final String MERGE_SUCCESS_COMMENT = MERGE_SUCCESS_PREFIX
 			+ REQUESTED_BY;
 
@@ -52,7 +53,8 @@ public class BitbucketRepository {
 	private static final String MERGE_FAILURE_PREFIX_LOWER = MERGE_FAILURE_PREFIX
 			.toLowerCase();
 	private static final String MERGE_FAILURE_COMMENT = MERGE_FAILURE_PREFIX
-			+ REQUESTED_BY + "\n\n#### *Error while trying to merge Pull Request:*"
+			+ REQUESTED_BY
+			+ "\n\n#### *Error while trying to merge Pull Request:*"
 			+ "\n\n#### *%s*";
 
 	private static final String MERGE_NOT_ALLOWED_PREFIX = "## :warning: Merge Not Allowed";
@@ -63,13 +65,14 @@ public class BitbucketRepository {
 			+ "\n\n#### *%s does NOT have Merge permissions. Please contact Jenkins Admin for more information.*";
 
 	private static final String DECLINE_PREFIX = "## :x: Declined";
-	private static final String DECLINE_PREFIX_LOWER = DECLINE_PREFIX
-			.toLowerCase();
+	// private static final String DECLINE_PREFIX_LOWER = DECLINE_PREFIX
+	// .toLowerCase();
 	private static final String DECLINE_COMMENT = DECLINE_PREFIX + REQUESTED_BY;
 
 	private static final String DECLINE_NOT_ALLOWED_PREFIX = "## :warning: Decline Not Allowed";
-	private static final String DECLINE_NOT_ALLOWED_PREFIX_LOWER = DECLINE_NOT_ALLOWED_PREFIX
-			.toLowerCase();
+	// private static final String DECLINE_NOT_ALLOWED_PREFIX_LOWER =
+	// DECLINE_NOT_ALLOWED_PREFIX
+	// .toLowerCase();
 	private static final String DECLINE_NOT_ALLOWED_COMMENT = DECLINE_NOT_ALLOWED_PREFIX
 			+ REQUESTED_BY
 			+ "\n\n#### *%s does NOT have Decline permissions. Please contact Jenkins Admin for more information.*";
@@ -251,13 +254,14 @@ public class BitbucketRepository {
 
 				List<BitbucketPullRequestComment> comments = client
 						.getPullRequestComments(id);
-//				String commitMarker = String.format(SRC_DEST, sourceCommit,
-//						destinationCommit).toLowerCase();
+				// String commitMarker = String.format(SRC_DEST, sourceCommit,
+				// destinationCommit).toLowerCase();
 
 				operation = Operation.BUILD;
 				if (comments != null) {
 					boolean mergeMarkerFound = false;
 					boolean successBuildsNotFound = true;
+					boolean mergeFailedFound = false;
 					Collections.sort(comments);
 					Collections.reverse(comments);
 					for (BitbucketPullRequestComment comment : comments) {
@@ -270,7 +274,8 @@ public class BitbucketRepository {
 
 						if (!mergeMarkerFound
 								&& MERGE_REQUEST_MARKER
-										.equalsIgnoreCase(content)) {
+										.equalsIgnoreCase(content)
+								&& !mergeFailedFound) {
 							mergeMarkerFound = true;
 							commentAuthor = comment.getAuthor();
 							continue;
@@ -282,8 +287,13 @@ public class BitbucketRepository {
 							// commits and that build success comment was added
 							// by Jenkins user
 							if (content.contains(BUILD_SUCCESS_PREFIX_LOWER)
-									&& content.contains(sourceCommit) && content.contains(destinationCommit) && comment.getAuthor().getUsername()
-									.equalsIgnoreCase(trigger.getUsername())) {
+									&& content.contains(sourceCommit)
+									&& content.contains(destinationCommit)
+									&& comment
+											.getAuthor()
+											.getUsername()
+											.equalsIgnoreCase(
+													trigger.getUsername())) {
 								if (this.trigger.getAdminsList().contains(
 										commentAuthor.getUsername()
 												.toLowerCase())) {
@@ -323,26 +333,38 @@ public class BitbucketRepository {
 							}
 							break;
 						} else if (comment.getAuthor().getUsername()
-								.equalsIgnoreCase(trigger.getUsername())
-								&& (content.contains(BUILD_START_PREFIX_LOWER)
-										|| content
-												.contains(BUILD_SUCCESS_PREFIX_LOWER)
-										|| content
-												.contains(BUILD_FAILURE_PREFIX_LOWER)
-										|| content
-												.contains(MERGE_SUCCESS_PREFIX_LOWER)
-										|| content
-												.contains(MERGE_FAILURE_PREFIX_LOWER)
-										|| content
-												.contains(MERGE_NOT_ALLOWED_PREFIX_LOWER)
-										|| content
-												.contains(DECLINE_PREFIX_LOWER) || content
-											.contains(DECLINE_NOT_ALLOWED_PREFIX_LOWER))) {
-							operation = null;
-							break;
+								.equalsIgnoreCase(trigger.getUsername())) {
+							if (content.contains(BUILD_START_PREFIX_LOWER)
+									|| (content
+											.contains(BUILD_SUCCESS_PREFIX_LOWER)
+											&& content.contains(sourceCommit) && content
+												.contains(destinationCommit))
+									|| (content
+											.contains(BUILD_FAILURE_PREFIX_LOWER)
+											&& content.contains(sourceCommit) && content
+												.contains(destinationCommit))) {
+								operation = null;
+								break;
+							} else if ((content
+									.contains(BUILD_SUCCESS_PREFIX_LOWER) && (!content
+									.contains(sourceCommit) || !content
+									.contains(destinationCommit)))
+									|| (content
+											.contains(BUILD_FAILURE_PREFIX_LOWER) && (!content
+											.contains(sourceCommit) && !content
+											.contains(destinationCommit)))) {
+								operation = Operation.BUILD;
+								break;
+							} else if (content
+									.contains(MERGE_FAILURE_PREFIX_LOWER)
+									|| content
+											.contains(MERGE_NOT_ALLOWED_PREFIX_LOWER)) {
+								mergeFailedFound = true;
+							}
 						}
 					}
-					if (mergeMarkerFound && successBuildsNotFound && operation != operation.MERGE) {
+					if (mergeMarkerFound && successBuildsNotFound
+							&& operation != Operation.MERGE) {
 						operation = null;
 						this.client.postPullRequestComment(id, String.format(
 								MERGE_FAILURE_COMMENT,
