@@ -36,4 +36,8 @@ public class BitbucketUser {
 		return new StringBuilder().append("username=").append(username)
 				.append(", displayName=").append(displayName).toString();
 	}
+	
+	public String toStringFormat() {
+		return displayName + " [" + username + "]";
+	}
 }

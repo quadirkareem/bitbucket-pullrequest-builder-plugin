@@ -21,14 +21,13 @@ public class BitbucketBuilds {
 
 	public BitbucketBuilds(BitbucketBuildTrigger trigger,
 			BitbucketRepository repository) {
-		logger.info("INIT: BitbucketBuilds()");
+		logger.finer("INIT");
 		this.trigger = trigger;
 		this.repository = repository;
 	}
 
 	public BitbucketCause getCause(AbstractBuild build) {
-		logger.info("BitbucketBuilds.getCause(): build displayName="
-				+ build.getDisplayName());
+		logger.finer("build displayName=" + build.getDisplayName());
 		Cause cause = build.getCause(BitbucketCause.class);
 		if (cause == null || !(cause instanceof BitbucketCause)) {
 			return null;
@@ -37,8 +36,7 @@ public class BitbucketBuilds {
 	}
 
 	public void onStarted(AbstractBuild build) {
-		logger.info("BitbucketBuilds.onStarted(): build displayName="
-				+ build.getDisplayName());
+		logger.finer("build displayName=" + build.getDisplayName());
 		BitbucketCause cause = this.getCause(build);
 		if (cause == null) {
 			return;
@@ -51,8 +49,7 @@ public class BitbucketBuilds {
 	}
 
 	public void onCompleted(AbstractBuild build) {
-		logger.info("BitbucketBuilds.onCompleted()(): build displayName="
-				+ build.getDisplayName());
+		logger.finer("build displayName=" + build.getDisplayName());
 		BitbucketCause cause = this.getCause(build);
 		if (cause == null) {
 			return;

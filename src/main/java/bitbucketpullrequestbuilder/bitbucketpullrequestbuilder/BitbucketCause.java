@@ -29,16 +29,20 @@ public class BitbucketCause extends Cause {
 			String destinationRepositoryName, String pullRequestTitle,
 			String sourceCommitHash, String destinationCommitHash,
 			String buildStartCommentId) {
-		logger.info("INIT: BitbucketCause(): sourceBranch=" + sourceBranch
-				+ ", targetBranch=" + targetBranch + ", repositoryOwner="
-				+ repositoryOwner + ", repositoryName=" + repositoryName
-				+ ", pullRequestId=" + pullRequestId
-				+ ", destinationRepositoryOwner=" + destinationRepositoryOwner
-				+ ", destinationRepositoryName=" + destinationRepositoryName
-				+ ", pullRequestTitle=" + pullRequestTitle
-				+ ", sourceCommitHash=" + sourceCommitHash
-				+ ", destnationCommitHash=" + destinationCommitHash
-				+ ", buildStartCommentId=" + buildStartCommentId);
+		logger.finer(new StringBuilder("INIT: BitbucketCause(): sourceBranch=")
+				.append(sourceBranch).append(", targetBranch=")
+				.append(targetBranch).append(", repositoryOwner=")
+				.append(repositoryOwner).append(", repositoryName=")
+				.append(repositoryName).append(", pullRequestId=")
+				.append(pullRequestId).append(", destinationRepositoryOwner=")
+				.append(destinationRepositoryOwner)
+				.append(", destinationRepositoryName=")
+				.append(destinationRepositoryName)
+				.append(", pullRequestTitle=").append(pullRequestTitle)
+				.append(", sourceCommitHash=").append(sourceCommitHash)
+				.append(", destnationCommitHash=")
+				.append(destinationCommitHash).append(", buildStartCommentId=")
+				.append(buildStartCommentId).toString());
 		this.sourceBranch = sourceBranch;
 		this.targetBranch = targetBranch;
 		this.repositoryOwner = repositoryOwner;
@@ -53,69 +57,88 @@ public class BitbucketCause extends Cause {
 	}
 
 	public String getSourceBranch() {
-		logger.info("BitbucketCause.getSourceBranch()");
+		logger.finer(sourceBranch);
 		return sourceBranch;
 	}
 
 	public String getTargetBranch() {
-		logger.info("BitbucketCause.getTargetBranch()");
+		logger.finer(targetBranch);
 		return targetBranch;
 	}
 
 	public String getRepositoryOwner() {
-		logger.info("BitbucketCause.getRepositoryOwner()");
+		logger.finer(repositoryOwner);
 		return repositoryOwner;
 	}
 
 	public String getRepositoryName() {
-		logger.info("BitbucketCause.getRepositoryName()");
+		logger.finer(repositoryName);
 		return repositoryName;
 	}
 
 	public String getPullRequestId() {
-		logger.info("BitbucketCause.getPullRequestId()");
+		logger.finer(pullRequestId);
 		return pullRequestId;
 	}
 
 	public String getDestinationRepositoryOwner() {
-		logger.info("BitbucketCause.getDestinationRepositoryOwner()");
+		logger.finer(destinationRepositoryOwner);
 		return destinationRepositoryOwner;
 	}
 
 	public String getDestinationRepositoryName() {
-		logger.info("BitbucketCause.getDestinationRepositoryName()");
+		logger.finer(destinationRepositoryName);
 		return destinationRepositoryName;
 	}
 
 	public String getPullRequestTitle() {
-		logger.info("BitbucketCause.getPullRequestTitle()");
+		logger.finer(pullRequestTitle);
 		return pullRequestTitle;
 	}
 
 	public String getSourceCommitHash() {
-		logger.info("BitbucketCause.getSourceCommitHash()");
+		logger.finer(sourceCommitHash);
 		return sourceCommitHash;
 	}
 
 	public String getDestinationCommitHash() {
-		logger.info("BitbucketCause.getDestinationCommitHash()");
+		logger.finer(destinationCommitHash);
 		return destinationCommitHash;
 	}
 
 	public String getBuildStartCommentId() {
-		logger.info("BitbucketCause.getBuildStartCommentId()");
+		logger.finer(buildStartCommentId);
 		return buildStartCommentId;
 	}
 
 	@Override
 	public String getShortDescription() {
-		logger.info("BitbucketCause.getShortDescription()");
 		String description = "<a href=" + BITBUCKET_URL
 				+ this.getDestinationRepositoryOwner() + "/";
 		description += this.getDestinationRepositoryName() + "/pull-request/"
 				+ this.getPullRequestId();
 		description += ">#" + this.getPullRequestId() + " "
 				+ this.getPullRequestTitle() + "</a>";
+		logger.finer(description);
 		return description;
 	}
+
+	@Override
+	public String toString() {
+		return new StringBuilder("BitbucketCause [sourceBranch=")
+				.append(sourceBranch).append(", targetBranch=")
+				.append(targetBranch).append(", repositoryOwner=")
+				.append(repositoryOwner).append(", repositoryName=")
+				.append(repositoryName).append(", pullRequestId=")
+				.append(pullRequestId).append(", destinationRepositoryOwner=")
+				.append(destinationRepositoryOwner)
+				.append(", destinationRepositoryName=")
+				.append(destinationRepositoryName)
+				.append(", pullRequestTitle=").append(pullRequestTitle)
+				.append(", sourceCommitHash=").append(sourceCommitHash)
+				.append(", destnationCommitHash=")
+				.append(destinationCommitHash).append(", buildStartCommentId=")
+				.append(buildStartCommentId).append("]").toString();
+	}
+
 }

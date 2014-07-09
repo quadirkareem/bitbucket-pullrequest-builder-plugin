@@ -19,8 +19,7 @@ public class BitbucketBuildListener extends RunListener<AbstractBuild> {
 
 	@Override
 	public void onStarted(AbstractBuild abstractBuild, TaskListener listener) {
-		logger.info("BitbucketBuildListener.onStarted(): build displayName="
-				+ abstractBuild.getDisplayName());
+		logger.finer("build displayName=" + abstractBuild.getDisplayName());
 		// logger.info("BuildListener onStarted called.");
 		BitbucketBuildTrigger trigger = BitbucketBuildTrigger
 				.getTrigger(abstractBuild.getProject());
@@ -33,8 +32,7 @@ public class BitbucketBuildListener extends RunListener<AbstractBuild> {
 	@Override
 	public void onCompleted(AbstractBuild abstractBuild,
 			@Nonnull TaskListener listener) {
-		logger.info("BitbucketBuildListener.onCompleted(): build displayName="
-				+ abstractBuild.getDisplayName());
+		logger.finer("build displayName=" + abstractBuild.getDisplayName());
 		BitbucketBuildTrigger trigger = BitbucketBuildTrigger
 				.getTrigger(abstractBuild.getProject());
 		if (trigger == null) {

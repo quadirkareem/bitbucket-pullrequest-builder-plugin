@@ -1,6 +1,7 @@
 package bitbucketpullrequestbuilder.bitbucketpullrequestbuilder;
 
 import bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.bitbucket.BitbucketPullRequestResponseValue;
+import bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.bitbucket.BitbucketUser;
 
 public class BitbucketPullRequest {
 
@@ -10,11 +11,13 @@ public class BitbucketPullRequest {
 
 	private Operation operation;
 	private BitbucketPullRequestResponseValue pullRequest;
+	private BitbucketUser commentAuthor;
 
 	public BitbucketPullRequest(Operation Operation,
-			BitbucketPullRequestResponseValue pullRequest) {
+			BitbucketPullRequestResponseValue pullRequest, BitbucketUser commentAuthor) {
 		this.operation = Operation;
 		this.pullRequest = pullRequest;
+		this.commentAuthor = commentAuthor;
 	}
 
 	public Operation getOperation() {
@@ -23,6 +26,10 @@ public class BitbucketPullRequest {
 
 	public BitbucketPullRequestResponseValue getPullRequest() {
 		return pullRequest;
+	}
+	
+	public BitbucketUser getCommentAuthor() {
+		return commentAuthor;
 	}
 
 }
