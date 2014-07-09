@@ -52,29 +52,15 @@ public class BitbucketRepository {
 	private static final String MERGE_FAILURE_PREFIX_LOWER = MERGE_FAILURE_PREFIX
 			.toLowerCase();
 	private static final String MERGE_FAILURE_COMMENT = MERGE_FAILURE_PREFIX
-			+ REQUESTED_BY + "\n\nError while trying to merge Pull Request:"
-			+ "\n\n%s";
+			+ REQUESTED_BY + "\n\n#### *Error while trying to merge Pull Request:*"
+			+ "\n\n#### *%s*";
 
 	private static final String MERGE_NOT_ALLOWED_PREFIX = "## :warning: Merge Not Allowed";
 	private static final String MERGE_NOT_ALLOWED_PREFIX_LOWER = MERGE_NOT_ALLOWED_PREFIX
 			.toLowerCase();
 	private static final String MERGE_NOT_ALLOWED_COMMENT = MERGE_NOT_ALLOWED_PREFIX
 			+ REQUESTED_BY
-			+ "\n\n#### %s does NOT have Merge permissions. Please contact Jenkins Admin for more information";
-
-	/*
-	 * private static final String MERGE_SUCCESS_MARKER = "[*MergeSuccess*]";
-	 * private static final String MERGE_SUCCESS_COMMENT = MERGE_SUCCESS_MARKER
-	 * + " \n\n :lock: **SUCCESS** - Pull Request Merged on request from %s";
-	 * private static final String MERGE_FAIL_MARKER = "[*MergeFailed*]";
-	 * private static final String MERGE_FAIL_COMMENT = MERGE_FAIL_MARKER +
-	 * " \n\n :confounded: **FAILURE** - Error while trying to merge Pull Request requested by %s \n\n %s"
-	 * ; private static final String MERGE_NOT_ALLOWED_MARKER =
-	 * "[*MergeNotAllowed*]"; private static final String
-	 * MERGE_NOT_ALLOWED_COMMENT = MERGE_NOT_ALLOWED_MARKER +
-	 * " \n\n %s does NOT have Merge permissions. Please contact Jenkins Admin for more information."
-	 * ;
-	 */
+			+ "\n\n#### *%s does NOT have Merge permissions. Please contact Jenkins Admin for more information.*";
 
 	private static final String DECLINE_PREFIX = "## :x: Declined";
 	private static final String DECLINE_PREFIX_LOWER = DECLINE_PREFIX
@@ -86,7 +72,7 @@ public class BitbucketRepository {
 			.toLowerCase();
 	private static final String DECLINE_NOT_ALLOWED_COMMENT = DECLINE_NOT_ALLOWED_PREFIX
 			+ REQUESTED_BY
-			+ "\n\n#### %s does NOT have Decline permissions. Please contact Jenkins Admin for more information";
+			+ "\n\n#### *%s does NOT have Decline permissions. Please contact Jenkins Admin for more information.*";
 
 	private String projectPath;
 	private BitbucketPullRequestsBuilder builder;
