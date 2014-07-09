@@ -251,8 +251,8 @@ public class BitbucketRepository {
 
 				List<BitbucketPullRequestComment> comments = client
 						.getPullRequestComments(id);
-				String commitMarker = String.format(SRC_DEST, sourceCommit,
-						destinationCommit).toLowerCase();
+//				String commitMarker = String.format(SRC_DEST, sourceCommit,
+//						destinationCommit).toLowerCase();
 
 				operation = Operation.BUILD;
 				if (comments != null) {
@@ -282,7 +282,7 @@ public class BitbucketRepository {
 							// commits and that build success comment was added
 							// by Jenkins user
 							if (content.contains(BUILD_SUCCESS_PREFIX_LOWER)
-									&& content.contains(commitMarker) && comment.getAuthor().getUsername()
+									&& content.contains(sourceCommit) && content.contains(destinationCommit) && comment.getAuthor().getUsername()
 									.equalsIgnoreCase(trigger.getUsername())) {
 								if (this.trigger.getAdminsList().contains(
 										commentAuthor.getUsername()
@@ -342,7 +342,7 @@ public class BitbucketRepository {
 							break;
 						}
 					}
-					if (mergeMarkerFound && successBuildsNotFound) {
+					if (mergeMarkerFound && successBuildsNotFound && operation != operation.MERGE) {
 						operation = null;
 						this.client.postPullRequestComment(id, String.format(
 								MERGE_FAILURE_COMMENT,

@@ -170,7 +170,7 @@ public class BitbucketApiClient {
 		try {
 			client.executeMethod(httppost);
 			response = httppost.getResponseBodyAsString();
-			logger.info("API Request Response: " + response);
+			logger.finer("API Request Response: " + response);
 		} catch (HttpException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -230,7 +230,10 @@ public class BitbucketApiClient {
 				JsonNode root = ((JsonNode) mapper.readTree(parser))
 						.path("error");
 				errorMessage = root.path("fields").path("newstatus").path(0)
-						.asText();
+						.asText().trim();
+				if(errorMessage == null || errorMessage.isEmpty()) {
+					errorMessage = root.path("message").asText().trim();
+				}
 				break;
 			}
 		}
