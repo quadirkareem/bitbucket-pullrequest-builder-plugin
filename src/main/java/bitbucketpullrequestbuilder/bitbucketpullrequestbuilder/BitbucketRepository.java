@@ -61,7 +61,6 @@ public class BitbucketRepository {
 	private static final String MERGE_NOT_ALLOWED_PREFIX_LOWER = MERGE_NOT_ALLOWED_PREFIX
 			.toLowerCase();
 	private static final String MERGE_NOT_ALLOWED_COMMENT = MERGE_NOT_ALLOWED_PREFIX
-			+ REQUESTED_BY
 			+ "\n\n#### *%s does NOT have Merge permissions. Please contact Jenkins Admin for more information.*";
 
 	private static final String DECLINE_PREFIX = "## :x: Declined";
@@ -74,7 +73,6 @@ public class BitbucketRepository {
 	// DECLINE_NOT_ALLOWED_PREFIX
 	// .toLowerCase();
 	private static final String DECLINE_NOT_ALLOWED_COMMENT = DECLINE_NOT_ALLOWED_PREFIX
-			+ REQUESTED_BY
 			+ "\n\n#### *%s does NOT have Decline permissions. Please contact Jenkins Admin for more information.*";
 
 	private String projectPath;
@@ -260,7 +258,8 @@ public class BitbucketRepository {
 				operation = Operation.BUILD;
 				if (comments != null) {
 					boolean mergeMarkerFound = false;
-					boolean successBuildsNotFound = true;
+					boolean successBuildNotFound = true;
+					boolean failedBuildNotFound = true;
 					boolean mergeFailedFound = false;
 					Collections.sort(comments);
 					Collections.reverse(comments);
@@ -286,27 +285,41 @@ public class BitbucketRepository {
 							// successfully for the latest source/destination
 							// commits and that build success comment was added
 							// by Jenkins user
-							if (content.contains(BUILD_SUCCESS_PREFIX_LOWER)
-									&& content.contains(sourceCommit)
+							if (content.contains(sourceCommit)
 									&& content.contains(destinationCommit)
 									&& comment
 											.getAuthor()
 											.getUsername()
 											.equalsIgnoreCase(
 													trigger.getUsername())) {
-								if (this.trigger.getAdminsList().contains(
-										commentAuthor.getUsername()
-												.toLowerCase())) {
-									operation = Operation.MERGE;
-								} else {
-									this.client.postPullRequestComment(id,
-											String.format(
-													MERGE_NOT_ALLOWED_COMMENT,
-													commentAuthor
-															.toStringFormat()));
+								if (content
+										.contains(BUILD_SUCCESS_PREFIX_LOWER)) {
+									if (this.trigger.getAdminsList().contains(
+											commentAuthor.getUsername()
+													.toLowerCase())) {
+										operation = Operation.MERGE;
+									} else {
+										this.client
+												.postPullRequestComment(
+														id,
+														String.format(
+																MERGE_NOT_ALLOWED_COMMENT,
+																commentAuthor
+																		.toStringFormat()));
+										operation = null;
+									}
+									successBuildNotFound = false;
+								} else if (content
+										.contains(BUILD_FAILURE_PREFIX_LOWER)) {
 									operation = null;
+									this.client.postPullRequestComment(id, String.format(
+											MERGE_FAILURE_COMMENT,
+											commentAuthor.toStringFormat(),
+											"Last Build was not Successful for Source: "
+													+ sourceCommit + " Destination: "
+													+ destinationCommit));
+									failedBuildNotFound = false;
 								}
-								successBuildsNotFound = false;
 								break;
 							}
 						} else if (BUILD_REQUEST_MARKER
@@ -322,13 +335,13 @@ public class BitbucketRepository {
 								operation = Operation.DECLINE;
 								commentAuthor = comment.getAuthor();
 							} else {
-								String declineAuthorString = declineAuthor
-										.getDisplayName().concat(" (")
-										.concat(declineAuthor.getUsername())
-										.concat(")");
-								this.client.postPullRequestComment(id, String
-										.format(DECLINE_NOT_ALLOWED_COMMENT,
-												declineAuthorString));
+								this.client
+										.postPullRequestComment(
+												id,
+												String.format(
+														DECLINE_NOT_ALLOWED_COMMENT,
+														declineAuthor
+																.toStringFormat()));
 								operation = null;
 							}
 							break;
@@ -363,7 +376,7 @@ public class BitbucketRepository {
 							}
 						}
 					}
-					if (mergeMarkerFound && successBuildsNotFound
+					if (mergeMarkerFound && successBuildNotFound && failedBuildNotFound
 							&& operation != Operation.MERGE) {
 						operation = null;
 						this.client.postPullRequestComment(id, String.format(
