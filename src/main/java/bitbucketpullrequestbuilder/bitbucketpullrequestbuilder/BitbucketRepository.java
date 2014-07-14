@@ -247,7 +247,7 @@ public class BitbucketRepository {
 			// branch names are CASE SENSITIVE
 			String destinationBranch = pullRequest.getDestination().getBranch()
 					.getName();
-			if (this.trigger.getTargetBranch().contains(destinationBranch)) {
+			if (this.trigger.getTargetBranch().equals(destinationBranch)) {
 				String id = pullRequest.getId();
 
 				List<BitbucketPullRequestComment> comments = client
@@ -378,7 +378,7 @@ public class BitbucketRepository {
 					}
 					if (mergeMarkerFound && successBuildNotFound && failedBuildNotFound
 							&& operation != Operation.MERGE) {
-						operation = null;
+						operation = Operation.BUILD;
 						this.client.postPullRequestComment(id, String.format(
 								MERGE_FAILURE_COMMENT,
 								commentAuthor.toStringFormat(),
