@@ -299,6 +299,7 @@ public class BitbucketRepository {
 								operation = null;
 							} else {
 								mergeMarkerFound = true;
+								mergeComment = comment.getContent().trim();
 								continue;
 							}
 						}
@@ -321,8 +322,6 @@ public class BitbucketRepository {
 											commentAuthor.getUsername()
 													.toLowerCase())) {
 										operation = Operation.MERGE;
-										mergeComment = comment.getContent()
-												.trim();
 									} else {
 										this.client
 												.postPullRequestComment(
