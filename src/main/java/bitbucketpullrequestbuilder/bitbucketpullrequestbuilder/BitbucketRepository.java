@@ -61,7 +61,10 @@ public class BitbucketRepository {
 	private static final String MERGE_NOT_ALLOWED_PREFIX_LOWER = MERGE_NOT_ALLOWED_PREFIX
 			.toLowerCase();
 	private static final String MERGE_NOT_ALLOWED_COMMENT = MERGE_NOT_ALLOWED_PREFIX
-			+ "\n\n#### *%s does NOT have Merge permissions. Please contact Jenkins Admin for more information.*";
+			+ "\n\n#### *%s does NOT have Merge permissions. Please contact Jenkins Admin ([releaseteam@ciphercloud.com](mailto:releaseteam@ciphercloud.com)) for more information.*";
+
+	private static final String SELF_MERGE_NOT_ALLOWED_COMMENT = MERGE_NOT_ALLOWED_PREFIX
+			+ "\n\n#### *%s CANNOT Merge his/her own Pull Request. Please request another team member with Merge permissions to review and merge.*";
 
 	private static final String DECLINE_PREFIX = "## :x: Declined";
 	// private static final String DECLINE_PREFIX_LOWER = DECLINE_PREFIX
@@ -73,7 +76,7 @@ public class BitbucketRepository {
 	// DECLINE_NOT_ALLOWED_PREFIX
 	// .toLowerCase();
 	private static final String DECLINE_NOT_ALLOWED_COMMENT = DECLINE_NOT_ALLOWED_PREFIX
-			+ "\n\n#### *%s does NOT have Decline permissions. Please contact Jenkins Admin for more information.*";
+			+ "\n\n#### *%s does NOT have Decline permissions. Please contact Jenkins Admin ([releaseteam@ciphercloud.com](mailto:releaseteam@ciphercloud.com)) for more information.*";
 
 	private String projectPath;
 	private BitbucketPullRequestsBuilder builder;
@@ -281,10 +284,23 @@ public class BitbucketRepository {
 						content = content.toLowerCase().trim();
 
 						if (!mergeMarkerFound && !mergeFailedFound
-								&& MERGE_CMD.startsWith(content)) {
-							mergeMarkerFound = true;
+								&& content.startsWith(MERGE_CMD)) {
 							commentAuthor = comment.getAuthor();
-							continue;
+							if (commentAuthor.getUsername().equalsIgnoreCase(
+									pullRequest.getAuthor().getUsername())) {
+								// cannot merge one's own pull request
+								this.client
+										.postPullRequestComment(
+												id,
+												String.format(
+														SELF_MERGE_NOT_ALLOWED_COMMENT,
+														commentAuthor
+																.toStringFormat()));
+								operation = null;
+							} else {
+								mergeMarkerFound = true;
+								continue;
+							}
 						}
 
 						if (mergeMarkerFound) {
@@ -420,8 +436,7 @@ public class BitbucketRepository {
 		String actualMergeComment = String.format(MERGE_COMMIT_COMMENT,
 				sourceBranch, id);
 		if (mergeComment != null && !mergeComment.isEmpty()) {
-			mergeComment = mergeComment
-					.substring(MERGE_CMD.length()).trim();
+			mergeComment = mergeComment.substring(MERGE_CMD.length()).trim();
 			int startIndex = (mergeComment.indexOf('"') == 0) ? 1 : 0;
 			int endIndex = (mergeComment.lastIndexOf('"') == mergeComment
 					.length() - 1) ? (mergeComment.length() - 1) : mergeComment
@@ -429,8 +444,8 @@ public class BitbucketRepository {
 			System.out.println("startIndex=" + startIndex + ", endIndex="
 					+ endIndex);
 			if (startIndex > -1 && endIndex > startIndex) {
-				actualMergeComment += ". " + mergeComment.substring(startIndex,
-						endIndex);
+				actualMergeComment += ". "
+						+ mergeComment.substring(startIndex, endIndex);
 			}
 		}
 
@@ -449,7 +464,7 @@ public class BitbucketRepository {
 				}
 			}
 		}
-		
+
 		return false;
 	}
 

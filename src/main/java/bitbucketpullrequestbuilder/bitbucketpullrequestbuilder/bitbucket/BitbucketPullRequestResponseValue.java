@@ -20,6 +20,7 @@ public class BitbucketPullRequestResponseValue {
 	private String updatedOn;
 	private BitbucketPullRequestResponseValueRepositoryCommit mergeCommit;
 	private String id;
+	private BitbucketUser author;
 
 	public String getDescription() {
 		return description;
@@ -72,6 +73,16 @@ public class BitbucketPullRequestResponseValue {
 	@JsonProperty("closed_by")
 	public void setClosedBy(BitbucketUser closedBy) {
 		this.closedBy = closedBy;
+	}
+	
+	@JsonProperty("author")
+	public BitbucketUser getAuthor() {
+		return author;
+	}
+
+	@JsonProperty("author")
+	public void setAuthor(BitbucketUser author) {
+		this.author = author;
 	}
 
 	public BitbucketPullRequestResponseValueRepository getSource() {
