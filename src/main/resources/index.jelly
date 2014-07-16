@@ -2,5 +2,5 @@
   This view is used to render the installed plugins page.
 -->
 <div>
-  This Jenkins plugin builds pull requests from Bitbucket.org and will report the test results.
+  This Jenkins plugin builds pull requests from Bitbucket.org and will report test results.
 </div>

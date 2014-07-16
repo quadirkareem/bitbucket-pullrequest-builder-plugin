@@ -20,7 +20,6 @@ public class BitbucketRepository {
 			.getLogger(BitbucketRepository.class.getName());
 	private static final String BUILD_CMD = "jenkins -t";
 	private static final String MERGE_CMD = "jenkins -m";
-	private static final String DECLINE_CMD = "jenkins -d";
 
 	private static final String SRC_DEST = "\n\n**Source:** %s **Destination:** %s";
 	private static final String REQUESTED_BY = "\n\n**Requested By:** %s";
@@ -65,18 +64,6 @@ public class BitbucketRepository {
 
 	private static final String SELF_MERGE_NOT_ALLOWED_COMMENT = MERGE_NOT_ALLOWED_PREFIX
 			+ "\n\n#### *%s CANNOT Merge his/her own Pull Request. Please request another team member with Merge permissions to review and merge.*";
-
-	private static final String DECLINE_PREFIX = "## :x: Declined";
-	// private static final String DECLINE_PREFIX_LOWER = DECLINE_PREFIX
-	// .toLowerCase();
-	private static final String DECLINE_COMMENT = DECLINE_PREFIX + REQUESTED_BY;
-
-	private static final String DECLINE_NOT_ALLOWED_PREFIX = "## :warning: Decline Not Allowed";
-	// private static final String DECLINE_NOT_ALLOWED_PREFIX_LOWER =
-	// DECLINE_NOT_ALLOWED_PREFIX
-	// .toLowerCase();
-	private static final String DECLINE_NOT_ALLOWED_COMMENT = DECLINE_NOT_ALLOWED_PREFIX
-			+ "\n\n#### *%s does NOT have Decline permissions. Please contact Jenkins Admin for more information.*";
 
 	private String projectPath;
 	private BitbucketPullRequestsBuilder builder;
@@ -173,21 +160,8 @@ public class BitbucketRepository {
 			case MERGE:
 				this.mergePullRequest(pullRequestValue, commentAuthor, comment);
 				break;
-			case DECLINE:
-				this.declinePullRequest(pullRequestValue, commentAuthor);
-				break;
 			}
 		}
-	}
-
-	public void declinePullRequest(
-			BitbucketPullRequestResponseValue pullRequestValue,
-			BitbucketUser commentAuthor) {
-		String id = pullRequestValue.getId();
-		logger.info("pullRequest id=" + id);
-		this.client.declinePullRequest(id);
-		this.client.postPullRequestComment(id,
-				String.format(DECLINE_COMMENT, commentAuthor.toStringFormat()));
 	}
 
 	public void mergePullRequest(
@@ -354,23 +328,6 @@ public class BitbucketRepository {
 						} else if (BUILD_CMD.equals(content)) {
 							operation = Operation.BUILD;
 							commentAuthor = comment.getAuthor();
-							break;
-						} else if (DECLINE_CMD.equals(content)) {
-							BitbucketUser declineAuthor = comment.getAuthor();
-							if (this.trigger.getAdminsList().contains(
-									declineAuthor.getUsername().toLowerCase())) {
-								operation = Operation.DECLINE;
-								commentAuthor = comment.getAuthor();
-							} else {
-								this.client
-										.postPullRequestComment(
-												id,
-												String.format(
-														DECLINE_NOT_ALLOWED_COMMENT,
-														declineAuthor
-																.toStringFormat()));
-								operation = null;
-							}
 							break;
 						} else if (comment.getAuthor().getUsername()
 								.equalsIgnoreCase(trigger.getUsername())) {

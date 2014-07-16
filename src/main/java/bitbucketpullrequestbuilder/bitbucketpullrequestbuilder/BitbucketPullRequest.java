@@ -6,7 +6,7 @@ import bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.bitbucket.Bitbuck
 public class BitbucketPullRequest {
 
 	enum Operation {
-		MERGE, BUILD, DECLINE
+		MERGE, BUILD
 	};
 
 	private Operation operation;
