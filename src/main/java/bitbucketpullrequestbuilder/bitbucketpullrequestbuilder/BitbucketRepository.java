@@ -61,7 +61,7 @@ public class BitbucketRepository {
 	private static final String MERGE_NOT_ALLOWED_PREFIX_LOWER = MERGE_NOT_ALLOWED_PREFIX
 			.toLowerCase();
 	private static final String MERGE_NOT_ALLOWED_COMMENT = MERGE_NOT_ALLOWED_PREFIX
-			+ "\n\n#### *%s does NOT have Merge permissions. Please contact Jenkins Admin ([releaseteam@ciphercloud.com](mailto:releaseteam@ciphercloud.com)) for more information.*";
+			+ "\n\n#### *%s does NOT have Merge permissions. Please contact Jenkins Admin for more information.*";
 
 	private static final String SELF_MERGE_NOT_ALLOWED_COMMENT = MERGE_NOT_ALLOWED_PREFIX
 			+ "\n\n#### *%s CANNOT Merge his/her own Pull Request. Please request another team member with Merge permissions to review and merge.*";
@@ -76,7 +76,7 @@ public class BitbucketRepository {
 	// DECLINE_NOT_ALLOWED_PREFIX
 	// .toLowerCase();
 	private static final String DECLINE_NOT_ALLOWED_COMMENT = DECLINE_NOT_ALLOWED_PREFIX
-			+ "\n\n#### *%s does NOT have Decline permissions. Please contact Jenkins Admin ([releaseteam@ciphercloud.com](mailto:releaseteam@ciphercloud.com)) for more information.*";
+			+ "\n\n#### *%s does NOT have Decline permissions. Please contact Jenkins Admin for more information.*";
 
 	private String projectPath;
 	private BitbucketPullRequestsBuilder builder;
