@@ -170,11 +170,12 @@ public class BitbucketRepository {
 		String id = pullRequestValue.getId();
 		String sourceBranch = pullRequestValue.getSource().getBranch()
 				.getName();
+		boolean closeSourceBranch = pullRequestValue.getCloseSourceBranch();
 		logger.info(new StringBuilder("pullRequestId=").append(id)
 				.append(", sourceBranch=").append(sourceBranch).toString());
 
 		String errorMessage = this.client.mergePullRequest(id,
-				buildMergeComment(id, sourceBranch, mergeComment));
+				buildMergeComment(id, sourceBranch, mergeComment), closeSourceBranch);
 		if (errorMessage == null) {
 			this.client.postPullRequestComment(
 					id,

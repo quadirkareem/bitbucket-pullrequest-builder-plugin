@@ -75,7 +75,8 @@ public class BitbucketApiClient {
 		deleteRequest(path);
 	}
 
-	public String mergePullRequest(String pullRequestId, String message) {
+	public String mergePullRequest(String pullRequestId, String message,
+			boolean closeSourceBranch) {
 		// https://bitbucket.org/api/2.0/repositories/{owner}/{repo_slug}/pullrequests/{id}/merge
 		String path = V2_API_BASE_URL + this.owner + "/" + this.repositoryName
 				+ "/pullrequests/" + pullRequestId + "/merge";
@@ -83,10 +84,10 @@ public class BitbucketApiClient {
 		String response = null;
 		try {
 			NameValuePair content = new NameValuePair("message", message);
-			NameValuePair closeSourceBranch = new NameValuePair(
-					"close_source_branch", "true");
+			NameValuePair closeSourceBranchNVP = new NameValuePair(
+					"close_source_branch", Boolean.toString(closeSourceBranch));
 			response = postRequest(path, new NameValuePair[] { content,
-					closeSourceBranch });
+					closeSourceBranchNVP });
 			errorMessage = parseMergeResponseJson(response);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
@@ -231,7 +232,7 @@ public class BitbucketApiClient {
 						.path("error");
 				errorMessage = root.path("fields").path("newstatus").path(0)
 						.asText().trim();
-				if(errorMessage == null || errorMessage.isEmpty()) {
+				if (errorMessage == null || errorMessage.isEmpty()) {
 					errorMessage = root.path("message").asText().trim();
 				}
 				break;
