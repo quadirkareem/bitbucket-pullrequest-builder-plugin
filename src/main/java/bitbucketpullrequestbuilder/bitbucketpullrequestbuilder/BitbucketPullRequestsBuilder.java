@@ -1,6 +1,5 @@
 package bitbucketpullrequestbuilder.bitbucketpullrequestbuilder;
 
-import bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.bitbucket.BitbucketPullRequestResponseValue;
 import hudson.model.AbstractProject;
 
 import java.util.Collection;
@@ -10,53 +9,73 @@ import java.util.logging.Logger;
  * Created by nishio
  */
 public class BitbucketPullRequestsBuilder {
-    private static final Logger logger = Logger.getLogger(BitbucketBuildTrigger.class.getName());
-    private AbstractProject<?, ?> project;
-    private BitbucketBuildTrigger trigger;
-    private BitbucketRepository repository;
-    private BitbucketBuilds builds;
+	private static final Logger logger = Logger
+			.getLogger(BitbucketBuildTrigger.class.getName());
+	private AbstractProject<?, ?> project;
+	private BitbucketBuildTrigger trigger;
+	private BitbucketRepository repository;
+	private BitbucketBuilds builds;
 
-    public static BitbucketPullRequestsBuilder getBuilder() {
-        return new BitbucketPullRequestsBuilder();
-    }
+	public static BitbucketPullRequestsBuilder getBuilder() {
+		BitbucketPluginLogger.debug(logger, "INIT");
+		return new BitbucketPullRequestsBuilder();
+	}
 
-    public void stop() {
-        // TODO?
-    }
+	public void stop() {
+		logger.info("Stopping ...");
+	}
 
-    public void run() {
-        logger.info("Build Start.");
-        this.repository.init();
-        Collection<BitbucketPullRequestResponseValue> targetPullRequests = this.repository.getTargetPullRequests();
-        this.repository.addFutureBuildTasks(targetPullRequests);
-    }
+	public void run() {
+		logger.info(String.format("job=%s, Started ...",
+				project.getDisplayName()));
+		this.repository.init();
+		Collection<BitbucketPullRequest> targetPullRequests = this.repository
+				.getTargetPullRequests();
+		this.repository.addFutureBuildTasks(targetPullRequests);
+	}
 
-    public BitbucketPullRequestsBuilder setupBuilder() {
-        if (this.project == null || this.trigger == null) {
-            throw new IllegalStateException();
-        }
-        this.repository = new BitbucketRepository(this.trigger.getProjectPath(), this);
-        this.builds = new BitbucketBuilds(this.trigger, this.repository);
-        return this;
-    }
+	public BitbucketPullRequestsBuilder setupBuilder() {
+		logger.info("Setting up Builder ...");
+		if (this.project == null || this.trigger == null) {
+			throw new IllegalStateException();
+		}
+		this.repository = new BitbucketRepository(
+				this.trigger.getProjectPath(), this);
+		this.builds = new BitbucketBuilds(this.trigger, this.repository);
+		return this;
+	}
 
-    public void setProject(AbstractProject<?, ?> project) {
-        this.project = project;
-    }
+	public void setProject(AbstractProject<?, ?> project) {
+		BitbucketPluginLogger.debug(
+				logger,
+				String.format("project displayName=%s",
+						project.getDisplayName()));
+		this.project = project;
+	}
 
-    public void setTrigger(BitbucketBuildTrigger trigger) {
-        this.trigger = trigger;
-    }
+	public void setTrigger(BitbucketBuildTrigger trigger) {
+		BitbucketPluginLogger.debug(
+				logger,
+				String.format("trigger projectPath=%s",
+						trigger.getProjectPath()));
+		this.trigger = trigger;
+	}
 
-    public AbstractProject<?, ?> getProject() {
-        return this.project;
-    }
+	public AbstractProject<?, ?> getProject() {
+		BitbucketPluginLogger.debug(
+				logger,
+				String.format("project displayName=%s",
+						this.project.getDisplayName()));
+		return this.project;
+	}
 
-    public BitbucketBuildTrigger getTrigger() {
-        return this.trigger;
-    }
+	public BitbucketBuildTrigger getTrigger() {
+		BitbucketPluginLogger.debug(logger, "==");
+		return this.trigger;
+	}
 
-    public BitbucketBuilds getBuilds() {
-        return this.builds;
-    }
+	public BitbucketBuilds getBuilds() {
+		BitbucketPluginLogger.debug(logger, "==");
+		return this.builds;
+	}
 }
