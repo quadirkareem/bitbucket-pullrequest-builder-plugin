@@ -128,7 +128,8 @@ public class BitbucketPullRequestComment implements
 
 	@Override
 	public String toString() {
-		return new StringBuilder().append(", isEntityAuthor=")
+		return new StringBuilder()
+				.append("BitbucketPullRequestComment [isEntityAuthor=")
 				.append(isEntityAuthor).append(", pullRequestId=")
 				.append(pullRequestId).append(", contentRendered=")
 				.append(contentRendered).append(", deleted=").append(deleted)
@@ -136,7 +137,7 @@ public class BitbucketPullRequestComment implements
 				.append(", commentId=").append(commentId).append(", content=")
 				.append(content).append(", UtcCreatedOn=").append(UtcCreatedOn)
 				.append(", isSpam=").append(isSpam).append(", author=")
-				.append(author).toString();
+				.append(author).append("]").toString();
 	}
 
 }

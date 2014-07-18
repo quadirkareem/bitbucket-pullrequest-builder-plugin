@@ -17,7 +17,7 @@ public class BitbucketPullRequestsBuilder {
 	private BitbucketBuilds builds;
 
 	public static BitbucketPullRequestsBuilder getBuilder() {
-		logger.finer("INIT");
+		BitbucketPluginLogger.debug(logger, "INIT");
 		return new BitbucketPullRequestsBuilder();
 	}
 
@@ -26,7 +26,8 @@ public class BitbucketPullRequestsBuilder {
 	}
 
 	public void run() {
-		logger.info("Running ...");
+		logger.info(String.format("job=%s, Started ...",
+				project.getDisplayName()));
 		this.repository.init();
 		Collection<BitbucketPullRequest> targetPullRequests = this.repository
 				.getTargetPullRequests();
@@ -45,27 +46,36 @@ public class BitbucketPullRequestsBuilder {
 	}
 
 	public void setProject(AbstractProject<?, ?> project) {
-		logger.finer("project displayName=" + project.getDisplayName());
+		BitbucketPluginLogger.debug(
+				logger,
+				String.format("project displayName=%s",
+						project.getDisplayName()));
 		this.project = project;
 	}
 
 	public void setTrigger(BitbucketBuildTrigger trigger) {
-		logger.finer("trigger projectPath=" + trigger.getProjectPath());
+		BitbucketPluginLogger.debug(
+				logger,
+				String.format("trigger projectPath=%s",
+						trigger.getProjectPath()));
 		this.trigger = trigger;
 	}
 
 	public AbstractProject<?, ?> getProject() {
-		logger.finer("project displayName=" + this.project.getDisplayName());
+		BitbucketPluginLogger.debug(
+				logger,
+				String.format("project displayName=%s",
+						this.project.getDisplayName()));
 		return this.project;
 	}
 
 	public BitbucketBuildTrigger getTrigger() {
-		logger.finer("==");
+		BitbucketPluginLogger.debug(logger, "==");
 		return this.trigger;
 	}
 
 	public BitbucketBuilds getBuilds() {
-		logger.finer("==");
+		BitbucketPluginLogger.debug(logger, "==");
 		return this.builds;
 	}
 }

@@ -56,14 +56,15 @@ public class BitbucketBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 			String repositoryName, String targetBranch, String admins,
 			String ciSkipPhrases) throws ANTLRException {
 		super(cron);
-		logger.finer(new StringBuilder("INIT: projectPath=")
-				.append(projectPath).append(", cron=").append(cron)
-				.append(", username=").append(username).append(", password=")
-				.append(password).append(", repositoryOwner=")
-				.append(repositoryOwner).append(", repositoryName=")
-				.append(repositoryName).append(", targetBranch=")
-				.append(targetBranch).append(", admins=").append(admins)
-				.append(", ciSkipPhrases=").append(ciSkipPhrases).toString());
+		if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
+			BitbucketPluginLogger
+					.debug(logger,
+							String.format(
+									"INIT: projectPath=%s, cron=%s, username=%s, password=%s, repositoryOwner=%s, repositoryName=%s, targetBranch=%s, admins=%s, ciSkipPhrases=%s",
+									projectPath, cron, username, password,
+									repositoryOwner, repositoryName,
+									targetBranch, admins, ciSkipPhrases));
+		}
 		this.projectPath = projectPath;
 		this.cron = cron.trim();
 		this.username = username.trim();
@@ -77,58 +78,59 @@ public class BitbucketBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 	}
 
 	public String getProjectPath() {
-		logger.finer(projectPath);
+		BitbucketPluginLogger.debug(logger, projectPath);
 		return projectPath;
 	}
 
 	public String getCron() {
-		logger.finer(cron);
+		BitbucketPluginLogger.debug(logger, cron);
 		return cron;
 	}
 
 	public String getUsername() {
-		logger.finer(username);
+		BitbucketPluginLogger.debug(logger, username);
 		return username;
 	}
 
 	public String getPassword() {
-		logger.finer(password);
+		BitbucketPluginLogger.debug(logger, password);
 		return password;
 	}
 
 	public String getRepositoryOwner() {
-		logger.finer(repositoryOwner);
+		BitbucketPluginLogger.debug(logger, repositoryOwner);
 		return repositoryOwner;
 	}
 
 	public String getRepositoryName() {
-		logger.finer(repositoryName);
+		BitbucketPluginLogger.debug(logger, repositoryName);
 		return repositoryName;
 	}
 
 	public String getTargetBranch() {
-		logger.finer(targetBranch);
+		BitbucketPluginLogger.debug(logger, targetBranch);
 		return targetBranch;
 	}
 
 	public String getAdmins() {
-		logger.finer(admins);
+		BitbucketPluginLogger.debug(logger, admins);
 		return admins;
 	}
 
 	public Set<String> getAdminsList() {
-		logger.finer(Arrays.toString((String[]) adminsList
-				.toArray(new String[adminsList.size()])));
+		BitbucketPluginLogger.debug(logger, Arrays
+				.toString((String[]) adminsList.toArray(new String[adminsList
+						.size()])));
 		return adminsList;
 	}
 
 	public String getCiSkipPhrases() {
-		logger.finer(ciSkipPhrases);
+		BitbucketPluginLogger.debug(logger, ciSkipPhrases);
 		return ciSkipPhrases;
 	}
 
 	private void setAdminsList() {
-		logger.finer(admins);
+		BitbucketPluginLogger.debug(logger, admins);
 		if (admins == null || admins.trim().length() == 0) {
 			adminsList = new HashSet<String>();
 		} else {
@@ -142,9 +144,11 @@ public class BitbucketBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 
 	@Override
 	public void start(AbstractProject<?, ?> project, boolean newInstance) {
-		logger.finer(new StringBuilder("project displayName=")
-				.append(project.getDisplayName()).append(", newInstance=")
-				.append(newInstance).toString());
+		if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
+			BitbucketPluginLogger.debug(logger, String.format(
+					"project displayName=%s, newInstance=",
+					project.getDisplayName(), newInstance));
+		}
 		try {
 			this.bitbucketPullRequestsBuilder = BitbucketPullRequestsBuilder
 					.getBuilder();
@@ -159,19 +163,25 @@ public class BitbucketBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 	}
 
 	public static BitbucketBuildTrigger getTrigger(AbstractProject project) {
-		logger.finer("project displayName=" + project.getDisplayName());
+		BitbucketPluginLogger.debug(
+				logger,
+				String.format("project displayName=%s",
+						project.getDisplayName()));
 		return (BitbucketBuildTrigger) project
 				.getTrigger(BitbucketBuildTrigger.class);
 	}
 
 	public BitbucketPullRequestsBuilder getBuilder() {
-		logger.finer(bitbucketPullRequestsBuilder.toString());
+		BitbucketPluginLogger.debug(logger,
+				bitbucketPullRequestsBuilder.toString());
 		return bitbucketPullRequestsBuilder;
 	}
 
 	public QueueTaskFuture<?> startJob(BitbucketCause cause) {
-		logger.finer("BitbucketBuildTrigger.startJob(): cause shortDescription="
-				+ cause.getShortDescription());
+		BitbucketPluginLogger.debug(
+				logger,
+				String.format("cause shortDescription=%s",
+						cause.getShortDescription()));
 		Map<String, ParameterValue> values = new HashMap<String, ParameterValue>();
 		values.put("sourceBranch", new StringParameterValue("sourceBranch",
 				cause.getSourceBranch()));
@@ -194,6 +204,9 @@ public class BitbucketBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 		values.put("pullRequestTitle", new StringParameterValue(
 				"pullRequestTitle", cause.getPullRequestTitle()));
 
+		logger.info(String.format("job=%s, Triggering Build ...",
+				this.job.getDisplayName()));
+
 		return this.job.scheduleBuild2(0, cause, new ParametersAction(
 				new ArrayList(values.values())));
 	}
@@ -201,9 +214,12 @@ public class BitbucketBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 	@Override
 	public void run() {
 		if (this.getBuilder().getProject().isDisabled()) {
-			logger.info("Build Disabled. Skipping ...");
+			logger.info(String
+					.format("projectPath=%s, Build Disabled. Skipping ...",
+							projectPath));
 		} else {
-			logger.info("Running ...");
+			logger.info(String.format("projectPath=%s, Scheduled ...",
+					projectPath));
 			this.bitbucketPullRequestsBuilder.run();
 		}
 		this.getDescriptor().save();
@@ -218,28 +234,36 @@ public class BitbucketBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 	public static final class BitbucketBuildTriggerDescriptor extends
 			TriggerDescriptor {
 		public BitbucketBuildTriggerDescriptor() {
-			logger.finer("INIT");
+			BitbucketPluginLogger.debug(logger, "INIT");
 			load();
 		}
 
 		@Override
 		public boolean isApplicable(Item item) {
-			logger.finer("item displayName=" + item.getDisplayName());
+			BitbucketPluginLogger
+					.debug(logger,
+							String.format("item displayName=%s",
+									item.getDisplayName()));
 			return true;
 		}
 
 		@Override
 		public String getDisplayName() {
-			logger.finer("Bitbucket Pull Requests Builder");
+			BitbucketPluginLogger.debug(logger,
+					"Bitbucket Pull Requests Builder");
 			return "Bitbucket Pull Requests Builder";
 		}
 
 		@Override
 		public boolean configure(StaplerRequest req, JSONObject json)
 				throws FormException {
-			logger.finer(new StringBuilder("req url=")
-					.append(req.getRequestURLWithQueryString())
-					.append(", json=").append(json.toString()).toString());
+			if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
+				BitbucketPluginLogger.debug(
+						logger,
+						String.format("req url=%s, json=%s",
+								req.getRequestURLWithQueryString(),
+								json.toString()));
+			}
 			save();
 			return super.configure(req, json);
 		}

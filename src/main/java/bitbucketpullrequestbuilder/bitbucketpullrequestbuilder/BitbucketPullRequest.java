@@ -43,7 +43,7 @@ public class BitbucketPullRequest {
 	public String toString() {
 		return new StringBuilder("BitbucketPullRequest [operation=")
 				.append(operation).append(", pullRequest=").append(pullRequest)
-				.append(", commentAuthor=").append(commentAuthor).append(", comment=")
-				.append(comment).append("]").toString();
+				.append(", commentAuthor=").append(commentAuthor)
+				.append(", comment=").append(comment).append("]").toString();
 	}
 }
