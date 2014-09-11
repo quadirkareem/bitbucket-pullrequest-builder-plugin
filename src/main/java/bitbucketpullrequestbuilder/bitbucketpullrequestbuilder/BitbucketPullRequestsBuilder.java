@@ -10,7 +10,7 @@ import java.util.logging.Logger;
  */
 public class BitbucketPullRequestsBuilder {
 	private static final Logger logger = Logger
-			.getLogger(BitbucketBuildTrigger.class.getName());
+			.getLogger(BitbucketPullRequestsBuilder.class.getName());
 	private AbstractProject<?, ?> project;
 	private BitbucketBuildTrigger trigger;
 	private BitbucketRepository repository;

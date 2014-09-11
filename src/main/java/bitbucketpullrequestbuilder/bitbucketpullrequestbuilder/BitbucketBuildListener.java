@@ -15,7 +15,7 @@ import javax.annotation.Nonnull;
 @Extension
 public class BitbucketBuildListener extends RunListener<AbstractBuild> {
 	private static final Logger logger = Logger
-			.getLogger(BitbucketBuildTrigger.class.getName());
+			.getLogger(BitbucketBuildListener.class.getName());
 
 	@Override
 	public void onStarted(AbstractBuild abstractBuild, TaskListener listener) {

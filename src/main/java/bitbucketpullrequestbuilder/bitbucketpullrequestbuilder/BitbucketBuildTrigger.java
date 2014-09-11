@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -35,6 +36,10 @@ public class BitbucketBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 			.getLogger(BitbucketBuildTrigger.class.getName());
 	private static final Pattern DELIMITER_PATTERN = Pattern
 			.compile("(?s)[,;\\s]\\s*");
+	
+	private static final String POST_MERGE_JOB_MSG_NOT_CONFIGURED = "Post Merge Job NOT configured, nothing to do";
+	private static final String POST_MERGE_JOB_MSG_NOT_TRIGGERED = "Could NOT trigger Post Merge Job %s, Reason: Not found";
+	
 	private final String projectPath;
 	private final String cron;
 	private final String username;
@@ -42,28 +47,34 @@ public class BitbucketBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 	private final String repositoryOwner;
 	private final String repositoryName;
 	private final String targetBranch;
+	private final String postMergeJobName;
 	private final String admins;
 	private final String ciSkipPhrases;
 	private Set<String> adminsList;
-	transient private BitbucketPullRequestsBuilder bitbucketPullRequestsBuilder;
-
+	private transient BitbucketPullRequestsBuilder bitbucketPullRequestsBuilder;
+	private AbstractProject<?, ?> postMergeJob;
+	private String postMergeJobMessage = POST_MERGE_JOB_MSG_NOT_CONFIGURED;
+	private AbstractProject<?, ?> project;
+	
 	@Extension
 	public static final BitbucketBuildTriggerDescriptor descriptor = new BitbucketBuildTriggerDescriptor();
 
 	@DataBoundConstructor
 	public BitbucketBuildTrigger(String projectPath, String cron,
 			String username, String password, String repositoryOwner,
-			String repositoryName, String targetBranch, String admins,
-			String ciSkipPhrases) throws ANTLRException {
+			String repositoryName, String targetBranch,
+			String postMergeJobName, String admins, String ciSkipPhrases)
+			throws ANTLRException {
 		super(cron);
 		if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
 			BitbucketPluginLogger
 					.debug(logger,
 							String.format(
-									"INIT: projectPath=%s, cron=%s, username=%s, password=%s, repositoryOwner=%s, repositoryName=%s, targetBranch=%s, admins=%s, ciSkipPhrases=%s",
+									"INIT: projectPath=%s, cron=%s, username=%s, password=%s, repositoryOwner=%s, repositoryName=%s, targetBranch=%s, postMergeJobName=%s, admins=%s, ciSkipPhrases=%s",
 									projectPath, cron, username, password,
 									repositoryOwner, repositoryName,
-									targetBranch, admins, ciSkipPhrases));
+									targetBranch, postMergeJobName, admins,
+									ciSkipPhrases));
 		}
 		this.projectPath = projectPath;
 		this.cron = cron.trim();
@@ -72,6 +83,7 @@ public class BitbucketBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 		this.repositoryOwner = repositoryOwner.trim();
 		this.repositoryName = repositoryName.trim();
 		this.targetBranch = targetBranch.trim();
+		this.postMergeJobName = postMergeJobName.trim();
 		this.admins = admins;
 		this.ciSkipPhrases = ciSkipPhrases;
 		this.setAdminsList();
@@ -112,6 +124,24 @@ public class BitbucketBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 		return targetBranch;
 	}
 
+	public String getPostMergeJobName() {
+		BitbucketPluginLogger.debug(logger, postMergeJobName);
+		return postMergeJobName;
+	}
+
+	public AbstractProject<?, ?> getPostMergeJob() {
+		if (postMergeJob != null) {
+			BitbucketPluginLogger.debug(logger, postMergeJob.getFullName());
+		} else {
+			BitbucketPluginLogger.debug(logger, "Post MergeJob is null");
+		}
+		return postMergeJob;
+	}
+
+	public String getPostMergeJobMessage() {
+		return postMergeJobMessage;
+	}
+
 	public String getAdmins() {
 		BitbucketPluginLogger.debug(logger, admins);
 		return admins;
@@ -142,6 +172,28 @@ public class BitbucketBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 		}
 	}
 
+	private void setPostMergeJob() {
+		if (postMergeJobName != null && postMergeJobName.length() > 0) {
+			postMergeJob = Jenkins.getInstance().getItemByFullName(
+					postMergeJobName, AbstractProject.class);
+			if (postMergeJob == null) {
+				logger.warning(String.format(
+						"job=%s - Could NOT find Post Merge Job %s in Jenkins",
+						this.project.getDisplayName(), postMergeJobName));
+				postMergeJobMessage = String
+						.format(POST_MERGE_JOB_MSG_NOT_TRIGGERED,
+								postMergeJobName);
+			} else {
+				logger.info(String.format("job=%s - Post Merge Job %s found",
+						this.project.getDisplayName(),
+						postMergeJob.getDisplayName()));
+			}
+		} else {
+			logger.info(String.format("job=%s - Post Merge Job is Blank",
+					this.project.getDisplayName()));
+		}
+	}
+
 	@Override
 	public void start(AbstractProject<?, ?> project, boolean newInstance) {
 		if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
@@ -150,6 +202,8 @@ public class BitbucketBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 					project.getDisplayName(), newInstance));
 		}
 		try {
+			this.project = project;
+			this.setPostMergeJob();
 			this.bitbucketPullRequestsBuilder = BitbucketPullRequestsBuilder
 					.getBuilder();
 			this.bitbucketPullRequestsBuilder.setProject(project);
@@ -231,8 +285,24 @@ public class BitbucketBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 		super.stop();
 	}
 
+	@Override
+	public String toString() {
+		return new StringBuilder("BitbucketBuildTrigger [projectPath=")
+				.append(projectPath).append(", cron=").append(cron)
+				.append(", username=").append(username).append(", password=")
+				.append(password).append(", repositoryOwner=")
+				.append(repositoryOwner).append(", repositoryName=")
+				.append(repositoryName).append(", targetBranch=")
+				.append(targetBranch).append(", postMergeJobName=")
+				.append(postMergeJobName).append(", admins=").append(admins)
+				.append(", ciSkipPhrases=").append(ciSkipPhrases).append("]")
+				.toString();
+	}
+
 	public static final class BitbucketBuildTriggerDescriptor extends
 			TriggerDescriptor {
+		private static final String DISPLAY_NAME = "Bitbucket Pull Request Build Trigger";
+
 		public BitbucketBuildTriggerDescriptor() {
 			BitbucketPluginLogger.debug(logger, "INIT");
 			load();
@@ -249,9 +319,8 @@ public class BitbucketBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 
 		@Override
 		public String getDisplayName() {
-			BitbucketPluginLogger.debug(logger,
-					"Bitbucket Pull Requests Builder");
-			return "Bitbucket Pull Requests Builder";
+			BitbucketPluginLogger.debug(logger, DISPLAY_NAME);
+			return DISPLAY_NAME;
 		}
 
 		@Override
@@ -267,19 +336,6 @@ public class BitbucketBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 			save();
 			return super.configure(req, json);
 		}
-	}
-
-	@Override
-	public String toString() {
-		return new StringBuilder("BitbucketBuildTrigger [projectPath=")
-				.append(projectPath).append(", cron=").append(cron)
-				.append(", username=").append(username).append(", password=")
-				.append(password).append(", repositoryOwner=")
-				.append(repositoryOwner).append(", repositoryName=")
-				.append(repositoryName).append(", targetBranch=")
-				.append(targetBranch).append(", admins=").append(admins)
-				.append(", ciSkipPhrases=").append(ciSkipPhrases).append("]")
-				.toString();
 	}
 
 }

@@ -8,13 +8,16 @@
   <f:entry title="Bitbucket BasicAuth Password" field="password">
     <f:password />
   </f:entry>
-  <f:entry title="RepositoryOwner" field="repositoryOwner">
+  <f:entry title="Repository Owner" field="repositoryOwner">
     <f:textbox />
   </f:entry>
-  <f:entry title="RepositoryName" field="repositoryName">
+  <f:entry title="Repository Name" field="repositoryName">
     <f:textbox />
   </f:entry>
   <f:entry title="Target Branch to merge to" field="targetBranch">
+    <f:textbox />
+  </f:entry>  
+  <f:entry title="Post Merge Job" field="postMergeJobName">
     <f:textbox />
   </f:entry>
   <f:entry title="Users with Merge Permissions" field="admins">
