@@ -4,31 +4,22 @@
 	<parent>
 		<groupId>org.jenkins-ci.plugins</groupId>
 		<artifactId>plugin</artifactId>
-		<version>1.532</version><!-- which version of Jenkins is this plugin built 
-			against? -->
+		<!-- which version of Jenkins is this plugin built against? -->
+		<version>1.532</version>
 	</parent>
 
 	<artifactId>bitbucket-pullrequest-builder</artifactId>
 	<name>Bitbucket Pullrequest Builder Plugin</name>
-	<version>1.4.2</version>
-	<description>This Jenkins plugin builds pull requests from Bitbucket.org and will report the test results.</description>
+	<version>2.0</version>
+	<description>This Jenkins plugin builds pull requests from Bitbucket.org and will report test results.</description>
 	<packaging>hpi</packaging>
-	<url>https://wiki.jenkins-ci.org/display/JENKINS/Bitbucket+pullrequest+builder+plugin</url>
 
-	<scm>
-		<connection>scm:git:ssh://git@github.com/jenkinsci/bitbucket-pullrequest-builder-plugin.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/jenkinsci/bitbucket-pullrequest-builder-plugin.git</developerConnection>
-		<url>https://github.com/jenkinsci/bitbucket-pullrequest-builder-plugin.git</url>
-		<tag>HEAD</tag>
-	</scm>
-
-	<developers>
-		<developer>
-			<id>nishio_dens</id>
-			<name>nishio_dens</name>
-			<email>nishio@densan-labs.net</email>
-		</developer>
-	</developers>
+	<!-- <url>https://wiki.jenkins-ci.org/display/JENKINS/Bitbucket+pullrequest+builder+plugin</url> 
+		<scm> <connection>scm:git:ssh://git@github.com/jenkinsci/bitbucket-pullrequest-builder-plugin.git</connection> 
+		<developerConnection>scm:git:ssh://git@github.com/jenkinsci/bitbucket-pullrequest-builder-plugin.git</developerConnection> 
+		<url>https://github.com/jenkinsci/bitbucket-pullrequest-builder-plugin.git</url> 
+		<tag>HEAD</tag> </scm> <developers> <developer> <id>nishio_dens</id> <name>nishio_dens</name> 
+		<email>nishio@densan-labs.net</email> </developer> </developers> -->
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -58,6 +49,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>${project.artifactId}-${project.version}</finalName>
 		<plugins>
 			<plugin>
 				<artifactId>maven-release-plugin</artifactId>
