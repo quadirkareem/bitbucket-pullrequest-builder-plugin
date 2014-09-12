@@ -36,10 +36,10 @@ public class BitbucketBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 			.getLogger(BitbucketBuildTrigger.class.getName());
 	private static final Pattern DELIMITER_PATTERN = Pattern
 			.compile("(?s)[,;\\s]\\s*");
-	
+
 	private static final String POST_MERGE_JOB_MSG_NOT_CONFIGURED = "Post Merge Job NOT configured, nothing to do";
 	private static final String POST_MERGE_JOB_MSG_NOT_TRIGGERED = "Could NOT trigger Post Merge Job %s, Reason: Not found";
-	
+
 	private final String projectPath;
 	private final String cron;
 	private final String username;
@@ -55,7 +55,7 @@ public class BitbucketBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 	private AbstractProject<?, ?> postMergeJob;
 	private String postMergeJobMessage = POST_MERGE_JOB_MSG_NOT_CONFIGURED;
 	private AbstractProject<?, ?> project;
-	
+
 	@Extension
 	public static final BitbucketBuildTriggerDescriptor descriptor = new BitbucketBuildTriggerDescriptor();
 
@@ -180,9 +180,8 @@ public class BitbucketBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 				logger.warning(String.format(
 						"job=%s - Could NOT find Post Merge Job %s in Jenkins",
 						this.project.getDisplayName(), postMergeJobName));
-				postMergeJobMessage = String
-						.format(POST_MERGE_JOB_MSG_NOT_TRIGGERED,
-								postMergeJobName);
+				postMergeJobMessage = String.format(
+						POST_MERGE_JOB_MSG_NOT_TRIGGERED, postMergeJobName);
 			} else {
 				logger.info(String.format("job=%s - Post Merge Job %s found",
 						this.project.getDisplayName(),

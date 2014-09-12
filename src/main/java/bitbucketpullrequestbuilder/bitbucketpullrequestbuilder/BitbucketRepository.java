@@ -592,12 +592,12 @@ public class BitbucketRepository {
 				}
 			}
 		}
-		
+
 		if (operation != null) {
 			targetPullRequests.add(new BitbucketPullRequest(operation,
 					pullRequest, commentAuthor, mergeComment));
 		}
-		
+
 	}
 
 	private String buildMergeComment(String id, String sourceBranch,
