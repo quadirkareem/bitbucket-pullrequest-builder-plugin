@@ -70,7 +70,7 @@ public class BitbucketRepository {
 			+ "\n\n#### *%s CANNOT Merge his/her own Pull Request. Please request another team member with Merge permissions to review and merge.*";
 
 	private static final String POST_MERGE_JOB_MSG_TRIGGERED = "Post Merge Job %s triggered. URL: %s";
-	
+
 	private String projectPath;
 	private BitbucketPullRequestsBuilder builder;
 	private BitbucketBuildTrigger trigger;
@@ -188,21 +188,21 @@ public class BitbucketRepository {
 		logger.info(String.format("job=%s, pr_id=%s, sourceBranch=%s",
 				buildName, id, sourceBranch));
 
-		/*String errorMessage = this.client.mergePullRequest(id,
+		String errorMessage = this.client.mergePullRequest(id,
 				buildMergeComment(id, sourceBranch, mergeComment),
 				closeSourceBranch);
-		if (errorMessage == null) {*/
+		if (errorMessage == null) {
 			String triggerResult = this.triggerPostMergeJob(id, commentAuthor);
 			this.client.postPullRequestComment(
 					id,
 					String.format(MERGE_SUCCESS_COMMENT,
 							commentAuthor.toStringFormat(), triggerResult));
-			/*} else {
+		} else {
 			this.client.postPullRequestComment(
 					id,
 					String.format(MERGE_FAILURE_COMMENT,
 							commentAuthor.toStringFormat(), errorMessage));
-		}*/
+		}
 	}
 
 	private String triggerPostMergeJob(String id, BitbucketUser commentAuthor) {
@@ -217,8 +217,7 @@ public class BitbucketRepository {
 			postMergeJob.scheduleBuild2(0, cause);
 			String postMergeJobUrl = Jenkins.getInstance().getRootUrl()
 					+ postMergeJob.getUrl();
-			triggerResult = String.format(
-					POST_MERGE_JOB_MSG_TRIGGERED,
+			triggerResult = String.format(POST_MERGE_JOB_MSG_TRIGGERED,
 					postMergeJob.getDisplayName(), postMergeJobUrl);
 		} else {
 			triggerResult = this.trigger.getPostMergeJobMessage();
@@ -339,14 +338,15 @@ public class BitbucketRepository {
 															pullRequest
 																	.getAuthor()
 																	.getUsername()));
-								}/*
+								}
 								this.client
 										.postPullRequestComment(
 												id,
 												String.format(
 														SELF_MERGE_NOT_ALLOWED_COMMENT,
 														commentAuthor
-																.toStringFormat()));*/
+																.toStringFormat()));
+
 								operation = null;
 							} else {
 								if (logger
@@ -592,11 +592,33 @@ public class BitbucketRepository {
 				}
 			}
 		}
-		operation = Operation.MERGE;
+		
 		if (operation != null) {
 			targetPullRequests.add(new BitbucketPullRequest(operation,
 					pullRequest, commentAuthor, mergeComment));
 		}
+		
+	}
+
+	private String buildMergeComment(String id, String sourceBranch,
+			String mergeComment) {
+		String actualMergeComment = String.format(MERGE_COMMIT_COMMENT,
+				sourceBranch, id);
+		if (mergeComment != null && !mergeComment.isEmpty()) {
+			mergeComment = mergeComment.substring(MERGE_CMD.length()).trim();
+			int startIndex = (mergeComment.indexOf('"') == 0) ? 1 : 0;
+			int endIndex = (mergeComment.lastIndexOf('"') == mergeComment
+					.length() - 1) ? (mergeComment.length() - 1) : mergeComment
+					.length();
+			System.out.println("startIndex=" + startIndex + ", endIndex="
+					+ endIndex);
+			if (startIndex > -1 && endIndex > startIndex) {
+				actualMergeComment += ". "
+						+ mergeComment.substring(startIndex, endIndex);
+			}
+		}
+
+		return actualMergeComment;
 	}
 
 	private boolean isSkipBuild(String pullRequestTitle) {
