@@ -22,6 +22,8 @@ import org.codehaus.jackson.JsonToken;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 
+import bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.BitbucketPluginLogger;
+
 /**
  * Created by nishio
  */
@@ -183,6 +185,7 @@ public class BitbucketApiClient {
 
 	private BitbucketPullRequestResponse parsePullRequestJson(String response)
 			throws IOException {
+		BitbucketPluginLogger.debug(logger, "parsePullRequestJson():\n" + response);
 		ObjectMapper mapper = new ObjectMapper();
 		BitbucketPullRequestResponse parsedResponse;
 		parsedResponse = mapper.readValue(response,
@@ -192,6 +195,7 @@ public class BitbucketApiClient {
 
 	private List<BitbucketPullRequestComment> parseCommentJson(String response)
 			throws IOException {
+		BitbucketPluginLogger.debug(logger, "parseCommentJson():\n" + response);
 		ObjectMapper mapper = new ObjectMapper();
 		List<BitbucketPullRequestComment> parsedResponse;
 		parsedResponse = mapper.readValue(response,
@@ -202,6 +206,7 @@ public class BitbucketApiClient {
 
 	private BitbucketPullRequestComment parseSingleCommentJson(String response)
 			throws IOException {
+		BitbucketPluginLogger.debug(logger, "parseSingleCommentJson():\n" + response);
 		ObjectMapper mapper = new ObjectMapper();
 		BitbucketPullRequestComment parsedResponse;
 		parsedResponse = mapper.readValue(response,
@@ -210,6 +215,7 @@ public class BitbucketApiClient {
 	}
 
 	private String parseMergeResponseJson(String response) throws IOException {
+		BitbucketPluginLogger.debug(logger, "parseMergeResponseJson():\n" + response);
 		ObjectMapper mapper = new ObjectMapper();
 		BitbucketPullRequestResponseValue parsedResponse;
 		parsedResponse = mapper.readValue(response,
@@ -222,6 +228,7 @@ public class BitbucketApiClient {
 	}
 
 	private String parseErrorMessageJson(String response) throws IOException {
+		BitbucketPluginLogger.debug(logger, "parseErrorMessageJson():\n" + response);
 		String errorMessage = null;
 		JsonParser parser = jsonFactory.createJsonParser(response);
 		ObjectMapper mapper = new ObjectMapper();
