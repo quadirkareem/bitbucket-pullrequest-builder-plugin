@@ -31,7 +31,10 @@ public class BitbucketCause extends Cause {
                     logger,
                     String
                         .format(
-                            "INIT: sourceBranch=%s, targetBranch=%s, repositoryOwner=%s, repositoryName=%s, pullRequestId=%s, destinationRepositoryOwner=%s, destinationRepositoryName=%s, pullRequestTitle=%s, sourceCommitHash=%s, destinationCommitHash=%s, buildStartCommentId=%s",
+                            "INIT: sourceBranch=%s, targetBranch=%s, repositoryOwner=%s,"
+                            + " repositoryName=%s, pullRequestId=%s, destinationRepositoryOwner=%s,"
+                            + " destinationRepositoryName=%s, pullRequestTitle=%s, sourceCommitHash=%s,"
+                            + " destinationCommitHash=%s, buildStartCommentId=%s",
                             sourceBranch, targetBranch, repositoryOwner, repositoryName, pullRequestId,
                             destinationRepositoryOwner, destinationRepositoryName, pullRequestTitle, sourceCommitHash,
                             destinationCommitHash, buildStartCommentId));
@@ -50,57 +53,57 @@ public class BitbucketCause extends Cause {
     }
 
     public String getSourceBranch() {
-        BitbucketPluginLogger.debug(logger, sourceBranch);
+        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, sourceBranch);
         return sourceBranch;
     }
 
     public String getTargetBranch() {
-        BitbucketPluginLogger.debug(logger, targetBranch);
+        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, targetBranch);
         return targetBranch;
     }
 
     public String getRepositoryOwner() {
-        BitbucketPluginLogger.debug(logger, repositoryOwner);
+        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, repositoryOwner);
         return repositoryOwner;
     }
 
     public String getRepositoryName() {
-        BitbucketPluginLogger.debug(logger, repositoryName);
+        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, repositoryName);
         return repositoryName;
     }
 
     public String getPullRequestId() {
-        BitbucketPluginLogger.debug(logger, pullRequestId);
+        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, pullRequestId);
         return pullRequestId;
     }
 
     public String getDestinationRepositoryOwner() {
-        BitbucketPluginLogger.debug(logger, destinationRepositoryOwner);
+        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, destinationRepositoryOwner);
         return destinationRepositoryOwner;
     }
 
     public String getDestinationRepositoryName() {
-        BitbucketPluginLogger.debug(logger, destinationRepositoryName);
+        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, destinationRepositoryName);
         return destinationRepositoryName;
     }
 
     public String getPullRequestTitle() {
-        BitbucketPluginLogger.debug(logger, pullRequestTitle);
+        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, pullRequestTitle);
         return pullRequestTitle;
     }
 
     public String getSourceCommitHash() {
-        BitbucketPluginLogger.debug(logger, sourceCommitHash);
+        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, sourceCommitHash);
         return sourceCommitHash;
     }
 
     public String getDestinationCommitHash() {
-        BitbucketPluginLogger.debug(logger, destinationCommitHash);
+        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, destinationCommitHash);
         return destinationCommitHash;
     }
 
     public String getBuildStartCommentId() {
-        BitbucketPluginLogger.debug(logger, buildStartCommentId);
+        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, buildStartCommentId);
         return buildStartCommentId;
     }
 
@@ -109,7 +112,7 @@ public class BitbucketCause extends Cause {
         String description = "<a href=" + BITBUCKET_URL + this.getDestinationRepositoryOwner() + "/";
         description += this.getDestinationRepositoryName() + "/pull-request/" + this.getPullRequestId();
         description += ">#" + this.getPullRequestId() + " " + this.getPullRequestTitle() + "</a>";
-        BitbucketPluginLogger.debug(logger, description);
+        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, description);
         return description;
     }
 

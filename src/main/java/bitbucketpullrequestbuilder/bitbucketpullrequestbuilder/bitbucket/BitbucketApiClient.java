@@ -48,11 +48,11 @@ public class BitbucketApiClient {
     public List<BitbucketPullRequestResponseValue> getPullRequests() {
         try {
             if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                BitbucketPluginLogger.debug(logger, String.format("Invoking Http Request %s", pullRequestsUrl));
+                logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format("Invoking Http Request %s", pullRequestsUrl));
             }
             String response = getRequest(pullRequestsUrl);
             if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                BitbucketPluginLogger.debug(logger, String.format("Response for %s:\n%s", pullRequestsUrl, response));
+                logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format("Response for %s:\n%s", pullRequestsUrl, response));
             }
             return parsePullRequestJson(response).getPrValues();
         }
@@ -67,11 +67,11 @@ public class BitbucketApiClient {
             + "/pullrequests/" + pullRequestId + "/comments");
         try {
             if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                BitbucketPluginLogger.debug(logger, String.format("Invoking Http Request %s", pullRequestCommentsUrl));
+                logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format("Invoking Http Request %s", pullRequestCommentsUrl));
             }
             String response = getRequest(pullRequestCommentsUrl);
             if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                BitbucketPluginLogger.debug(logger,
+                logger.log(BitbucketPluginLogger.LEVEL_DEBUG,
                     String.format("Response for %s:\n%s", pullRequestCommentsUrl, response));
             }
             return parseCommentJson(response);
@@ -91,7 +91,7 @@ public class BitbucketApiClient {
             + "/pullrequests/" + pullRequestId + "/comments/" + commentId;
         try {
             if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                BitbucketPluginLogger.debug(logger,
+                logger.log(BitbucketPluginLogger.LEVEL_DEBUG,
                     String.format("Invoking Http Request %s", deletePullRequestCommentUrl));
             }
             deleteRequest(deletePullRequestCommentUrl);
@@ -111,14 +111,14 @@ public class BitbucketApiClient {
         String response = null;
         try {
             if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                BitbucketPluginLogger.debug(logger, String.format("Invoking Http Request %s", mergePullRequestUrl));
+                logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format("Invoking Http Request %s", mergePullRequestUrl));
             }
             NameValuePair content = new NameValuePair("message", message);
             NameValuePair closeSourceBranchNVP = new NameValuePair("close_source_branch",
                 Boolean.toString(closeSourceBranch));
             response = postRequest(mergePullRequestUrl, new NameValuePair[] { content, closeSourceBranchNVP });
             if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                BitbucketPluginLogger.debug(logger,
+                logger.log(BitbucketPluginLogger.LEVEL_DEBUG,
                     String.format("Response for %s:\n%s", mergePullRequestUrl, response));
             }
             errorMessage = parseMergeResponseJson(response);
@@ -141,7 +141,7 @@ public class BitbucketApiClient {
             + pullRequestId + "/decline";
         try {
             if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                BitbucketPluginLogger.debug(logger, String.format("Invoking Http Request %s", declinePullRequestUrl));
+                logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format("Invoking Http Request %s", declinePullRequestUrl));
             }
             postRequest(declinePullRequestUrl, null);
         }
@@ -159,13 +159,13 @@ public class BitbucketApiClient {
             + pullRequestId + "/comments";
         try {
             if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                BitbucketPluginLogger.debug(logger,
+                logger.log(BitbucketPluginLogger.LEVEL_DEBUG,
                     String.format("Invoking Http Request %s", postPullRequestCommentUrl));
             }
             NameValuePair content = new NameValuePair("content", comment);
             String response = postRequest(postPullRequestCommentUrl, new NameValuePair[] { content });
             if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                BitbucketPluginLogger.debug(logger,
+                logger.log(BitbucketPluginLogger.LEVEL_DEBUG,
                     String.format("Response for %s:\n%s", postPullRequestCommentUrl, response));
             }
             return parseSingleCommentJson(response);
@@ -239,7 +239,7 @@ public class BitbucketApiClient {
     }
 
     private BitbucketPullRequestResponse parsePullRequestJson(String response) throws IOException {
-        BitbucketPluginLogger.debug(logger, "parsePullRequestJson():\n" + response);
+        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, "parsePullRequestJson():\n" + response);
         ObjectMapper mapper = new ObjectMapper();
         BitbucketPullRequestResponse parsedResponse;
         parsedResponse = mapper.readValue(response, BitbucketPullRequestResponse.class);
@@ -247,7 +247,7 @@ public class BitbucketApiClient {
     }
 
     private List<BitbucketPullRequestComment> parseCommentJson(String response) throws IOException {
-        BitbucketPluginLogger.debug(logger, "parseCommentJson():\n" + response);
+        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, "parseCommentJson():\n" + response);
         ObjectMapper mapper = new ObjectMapper();
         List<BitbucketPullRequestComment> parsedResponse;
         parsedResponse = mapper.readValue(response, new TypeReference<List<BitbucketPullRequestComment>>() {});
@@ -255,7 +255,7 @@ public class BitbucketApiClient {
     }
 
     private BitbucketPullRequestComment parseSingleCommentJson(String response) throws IOException {
-        BitbucketPluginLogger.debug(logger, "parseSingleCommentJson():\n" + response);
+        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, "parseSingleCommentJson():\n" + response);
         ObjectMapper mapper = new ObjectMapper();
         BitbucketPullRequestComment parsedResponse;
         parsedResponse = mapper.readValue(response, BitbucketPullRequestComment.class);
@@ -263,7 +263,7 @@ public class BitbucketApiClient {
     }
 
     private String parseMergeResponseJson(String response) throws IOException {
-        BitbucketPluginLogger.debug(logger, "parseMergeResponseJson():\n" + response);
+        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, "parseMergeResponseJson():\n" + response);
         ObjectMapper mapper = new ObjectMapper();
         BitbucketPullRequestResponseValue parsedResponse;
         parsedResponse = mapper.readValue(response, BitbucketPullRequestResponseValue.class);
@@ -275,7 +275,7 @@ public class BitbucketApiClient {
     }
 
     private String parseErrorMessageJson(String response) throws IOException {
-        BitbucketPluginLogger.debug(logger, "parseErrorMessageJson():\n" + response);
+        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, "parseErrorMessageJson():\n" + response);
         String errorMessage = null;
         JsonParser parser = jsonFactory.createJsonParser(response);
         ObjectMapper mapper = new ObjectMapper();

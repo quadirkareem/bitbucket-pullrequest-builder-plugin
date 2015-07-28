@@ -15,7 +15,7 @@ public class TriggerJobCause extends Cause {
 
     public TriggerJobCause(String upstreamJob, String pullRequestId, String requestedBy) {
         if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-            BitbucketPluginLogger.debug(logger, String.format("INIT: upstreamJob=%s, pullRequestId=%s, requestedBy=%s",
+            logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format("INIT: upstreamJob=%s, pullRequestId=%s, requestedBy=%s",
                 upstreamJob, pullRequestId, requestedBy));
         }
         this.upstreamJob = upstreamJob;
@@ -24,23 +24,23 @@ public class TriggerJobCause extends Cause {
     }
 
     public String getSourceBranch() {
-        BitbucketPluginLogger.debug(logger, upstreamJob);
+        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, upstreamJob);
         return upstreamJob;
     }
 
     public String getPullRequestId() {
-        BitbucketPluginLogger.debug(logger, pullRequestId);
+        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, pullRequestId);
         return pullRequestId;
     }
 
     public String getRequestedBy() {
-        BitbucketPluginLogger.debug(logger, requestedBy);
+        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, requestedBy);
         return requestedBy;
     }
 
     @Override
     public String getShortDescription() {
-        BitbucketPluginLogger.debug(logger, toString());
+        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, toString());
         return toString();
     }
 

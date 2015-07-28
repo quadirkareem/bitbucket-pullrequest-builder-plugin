@@ -72,7 +72,7 @@ public class BitbucketRepository {
         this.builder = builder;
         this.buildName = this.builder.getProject().getDisplayName();
         if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-            BitbucketPluginLogger.debug(logger, String.format(
+            logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format(
                 "BitbucketRepository Object Instantiated: projectPath=%s, job=%s", projectPath, buildName));
         }
     }
@@ -190,7 +190,7 @@ public class BitbucketRepository {
         }
         else {
             triggerResult = this.trigger.getPostMergeJobMessage();
-            BitbucketPluginLogger.debug(logger,
+            logger.log(BitbucketPluginLogger.LEVEL_DEBUG,
                 String.format("job=%s, pullRequestId=%s - Post Merge Job is Blank", buildName, id));
         }
 
@@ -251,13 +251,13 @@ public class BitbucketRepository {
                     Collections.reverse(comments);
                     for (BitbucketPullRequestComment comment : comments) {
                         if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                            BitbucketPluginLogger.debug(logger, String.format("job=%s, pullRequestId=%s, comment=%s",
+                            logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format("job=%s, pullRequestId=%s, comment=%s",
                                 buildName, id, comment.toString()));
                         }
                         String content = comment.getContent();
                         if (content == null || content.isEmpty()) {
                             if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                                BitbucketPluginLogger.debug(logger, String.format(
+                                logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format(
                                     "job=%s, pullRequestId=%s - comment is either null or empty", buildName, id));
                             }
                             continue;
@@ -266,14 +266,14 @@ public class BitbucketRepository {
 
                         if (!mergeMarkerFound && !mergeFailedFound && content.startsWith(MERGE_CMD)) {
                             if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                                BitbucketPluginLogger.debug(logger,
+                                logger.log(BitbucketPluginLogger.LEVEL_DEBUG,
                                     String.format("job=%s, pullRequestId=%s - merge request found", buildName, id));
                             }
                             commentAuthor = comment.getAuthor();
                             if (commentAuthor.getUsername().equalsIgnoreCase(pullRequest.getAuthor().getUsername())) {
                                 // cannot merge one's own pull request
                                 if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                                    BitbucketPluginLogger.debug(logger, String.format(
+                                    logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format(
                                         "job=%s, pullRequestId=%s - pull Request author "
                                             + "[%s] & merge requester [%s] are same, won't merge", buildName, id,
                                         commentAuthor.getUsername(), pullRequest.getAuthor().getUsername()));
@@ -285,7 +285,7 @@ public class BitbucketRepository {
                             }
                             else {
                                 if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                                    BitbucketPluginLogger.debug(logger, String.format(
+                                    logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format(
                                         "job=%s, pullRequestId=%s - merge found, continue to"
                                             + " find successful build ...", buildName, id));
                                 }
@@ -297,7 +297,7 @@ public class BitbucketRepository {
 
                         if (mergeMarkerFound) {
                             if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                                BitbucketPluginLogger.debug(logger, String.format(
+                                logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format(
                                     "job=%s, pullRequestId=%s - merge request found earlier", buildName, id));
                             }
 
@@ -308,7 +308,7 @@ public class BitbucketRepository {
                             if (content.contains(sourceCommit) && content.contains(destinationCommit)
                                 && comment.getAuthor().getUsername().equalsIgnoreCase(trigger.getUsername())) {
                                 if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                                    BitbucketPluginLogger.debug(logger, String.format(
+                                    logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format(
                                         "job=%s, pullRequestId=%s - this comment contains latest "
                                             + "sourceCommit [%s] and latest destination commit [%s] "
                                             + "and this comment was added by jenkins user", buildName, id,
@@ -317,7 +317,7 @@ public class BitbucketRepository {
 
                                 if (content.contains(BUILD_SUCCESS_PREFIX_LOWER)) {
                                     if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                                        BitbucketPluginLogger.debug(logger, String.format(
+                                        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format(
                                             "job=%s, pullRequestId=%s - this comment contains build "
                                                 + "success prefix", buildName, id));
                                     }
@@ -349,7 +349,7 @@ public class BitbucketRepository {
                                 }
                                 else if (content.contains(BUILD_FAILURE_PREFIX_LOWER)) {
                                     if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                                        BitbucketPluginLogger.debug(logger, String.format(
+                                        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format(
                                             "job=%s, pullRequestId=%s - this comment contains build"
                                                 + " success prefix", buildName, id));
                                     }
@@ -364,7 +364,7 @@ public class BitbucketRepository {
                         }
                         else if (BUILD_CMD.equals(content)) {
                             if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                                BitbucketPluginLogger.debug(logger, String.format(
+                                logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format(
                                     "job=%s, pullRequestId=%s - build request comment found", buildName, id));
                             }
                             operation = Operation.BUILD;
@@ -373,16 +373,16 @@ public class BitbucketRepository {
                         }
                         else if (comment.getAuthor().getUsername().equalsIgnoreCase(trigger.getUsername())) {
                             if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                                BitbucketPluginLogger.debug(logger, String.format(
+                                logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format(
                                     "job=%s, pullRequestId=%s - comment author is jenkins user", buildName, id));
                             }
                             if (content.contains(BUILD_START_PREFIX_LOWER)
-                                || (content.contains(BUILD_SUCCESS_PREFIX_LOWER) && content.contains(sourceCommit) 
-                                    && content.contains(destinationCommit))
-                                || (content.contains(BUILD_FAILURE_PREFIX_LOWER) && content.contains(sourceCommit) 
-                                    && content.contains(destinationCommit))) {
+                                || (content.contains(BUILD_SUCCESS_PREFIX_LOWER) && content.contains(sourceCommit) && content
+                                    .contains(destinationCommit))
+                                || (content.contains(BUILD_FAILURE_PREFIX_LOWER) && content.contains(sourceCommit) && content
+                                    .contains(destinationCommit))) {
                                 if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                                    BitbucketPluginLogger.debug(logger, String.format(
+                                    logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format(
                                         "job=%s, pullRequestId=%s - comment contains either "
                                             + "(build started) or (build success and latest source "
                                             + "commit [%s] and latest destination commit [%s]]) "
@@ -393,10 +393,10 @@ public class BitbucketRepository {
                                 operation = null;
                                 break;
                             }
-                            else if ((content.contains(BUILD_SUCCESS_PREFIX_LOWER) && (!content.contains(sourceCommit)
-                                || !content.contains(destinationCommit)))
-                                || (content.contains(BUILD_FAILURE_PREFIX_LOWER) && (!content.contains(sourceCommit)
-                                    && !content.contains(destinationCommit)))) {
+                            else if ((content.contains(BUILD_SUCCESS_PREFIX_LOWER) && (!content.contains(sourceCommit) || !content
+                                .contains(destinationCommit)))
+                                || (content.contains(BUILD_FAILURE_PREFIX_LOWER) && (!content.contains(sourceCommit) && !content
+                                    .contains(destinationCommit)))) {
                                 if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
                                     BitbucketPluginLogger
                                         .debug(logger, String.format(
@@ -412,7 +412,7 @@ public class BitbucketRepository {
                             else if (content.contains(MERGE_FAILURE_PREFIX_LOWER)
                                 || content.contains(MERGE_NOT_ALLOWED_PREFIX_LOWER)) {
                                 if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                                    BitbucketPluginLogger.debug(logger, String.format(
+                                    logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format(
                                         "job=%s, pullRequestId=%s - comment contains either"
                                             + " merge failure or merge not allowed", buildName, id));
                                 }
@@ -420,10 +420,9 @@ public class BitbucketRepository {
                             }
                         }
                     }
-                    if (mergeMarkerFound && successBuildNotFound && failedBuildNotFound && 
-                        operation != Operation.MERGE) {
+                    if (mergeMarkerFound && successBuildNotFound && failedBuildNotFound && operation != Operation.MERGE) {
                         if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                            BitbucketPluginLogger.debug(logger, String.format(
+                            logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format(
                                 "job=%s, pullRequestId=%s - merge request found and build success "
                                     + "NOT found and build failure NOT found and operation [%s] is NOT merge",
                                 buildName, id, operation));
@@ -436,7 +435,7 @@ public class BitbucketRepository {
                 }
 
                 if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                    BitbucketPluginLogger.debug(logger,
+                    logger.log(BitbucketPluginLogger.LEVEL_DEBUG,
                         String.format("job=%s, pullRequestId=%s, operation=%s", buildName, id, operation));
                 }
                 if (operation == Operation.BUILD && isSkipBuild(pullRequest.getTitle())) {
@@ -445,7 +444,7 @@ public class BitbucketRepository {
             }
             else {
                 if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                    BitbucketPluginLogger.debug(logger, String.format(
+                    logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format(
                         "job=%s, target branch [%s] and destinationBranch [%s] do NOT match", buildName,
                         this.trigger.getTargetBranch(), destinationBranch));
                 }

@@ -16,7 +16,7 @@ public class BitbucketPullRequestsBuilder {
     private BitbucketBuilds builds;
 
     public static BitbucketPullRequestsBuilder getBuilder() {
-        BitbucketPluginLogger.debug(logger, "INIT");
+        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, "INIT");
         return new BitbucketPullRequestsBuilder();
     }
 
@@ -28,7 +28,7 @@ public class BitbucketPullRequestsBuilder {
         logger.info(String.format("job=%s => BitbucketPullRequestsBuilder.run()", project.getDisplayName()));
         this.repository.init();
         if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-            BitbucketPluginLogger.debug(logger,
+            logger.log(BitbucketPluginLogger.LEVEL_DEBUG,
                 String.format("job=%s => getting Target Pull Requests ...", project.getDisplayName()));
         }
         Collection<BitbucketPullRequest> targetPullRequests = this.repository.getTargetPullRequests();
@@ -47,35 +47,35 @@ public class BitbucketPullRequestsBuilder {
 
     public void setProject(AbstractProject<?, ?> project) {
         if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-            BitbucketPluginLogger.debug(logger, String.format("project displayName=%s", project.getDisplayName()));
+            logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format("project displayName=%s", project.getDisplayName()));
         }
         this.project = project;
     }
 
     public void setTrigger(BitbucketBuildTrigger trigger) {
         if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-            BitbucketPluginLogger.debug(logger, String.format("trigger projectPath=%s", trigger.getProjectPath()));
+            logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format("trigger projectPath=%s", trigger.getProjectPath()));
         }
         this.trigger = trigger;
     }
 
     public AbstractProject<?, ?> getProject() {
         if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-            BitbucketPluginLogger.debug(logger, String.format("project displayName=%s", this.project.getDisplayName()));
+            logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format("project displayName=%s", this.project.getDisplayName()));
         }
         return this.project;
     }
 
     public BitbucketBuildTrigger getTrigger() {
         if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-            BitbucketPluginLogger.debug(logger, "==");
+            logger.log(BitbucketPluginLogger.LEVEL_DEBUG, "==");
         }
         return this.trigger;
     }
 
     public BitbucketBuilds getBuilds() {
         if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-            BitbucketPluginLogger.debug(logger, "==");
+            logger.log(BitbucketPluginLogger.LEVEL_DEBUG, "==");
         }
         return this.builds;
     }

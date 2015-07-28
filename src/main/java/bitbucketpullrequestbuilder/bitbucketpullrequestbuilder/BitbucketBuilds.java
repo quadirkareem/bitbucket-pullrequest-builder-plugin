@@ -20,7 +20,7 @@ public class BitbucketBuilds {
 
     public BitbucketBuilds(BitbucketBuildTrigger trigger, BitbucketRepository repository) {
         if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-            BitbucketPluginLogger.debug(logger, "INIT");
+            logger.log(BitbucketPluginLogger.LEVEL_DEBUG, "INIT");
         }
         this.trigger = trigger;
         this.repository = repository;
@@ -28,7 +28,7 @@ public class BitbucketBuilds {
 
     public BitbucketCause getCause(AbstractBuild build) {
         if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-            BitbucketPluginLogger.debug(logger, String.format("build displayName=%s", build.getDisplayName()));
+            logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format("build displayName=%s", build.getDisplayName()));
         }
         Cause cause = build.getCause(BitbucketCause.class);
         if (cause == null || !(cause instanceof BitbucketCause)) {
@@ -39,7 +39,7 @@ public class BitbucketBuilds {
 
     public void onStarted(AbstractBuild build) {
         if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-            BitbucketPluginLogger.debug(logger, String.format("build displayName=%s", build.getDisplayName()));
+            logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format("build displayName=%s", build.getDisplayName()));
         }
 
         BitbucketCause cause = this.getCause(build);
@@ -56,7 +56,7 @@ public class BitbucketBuilds {
 
     public void onCompleted(AbstractBuild build) {
         if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-            BitbucketPluginLogger.debug(logger, String.format("build displayName=%s", build.getDisplayName()));
+            logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format("build displayName=%s", build.getDisplayName()));
         }
         BitbucketCause cause = this.getCause(build);
         if (cause == null) {
