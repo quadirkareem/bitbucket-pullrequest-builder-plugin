@@ -5,45 +5,43 @@ import bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.bitbucket.Bitbuck
 
 public class BitbucketPullRequest {
 
-	enum Operation {
-		MERGE, BUILD
-	};
+    enum Operation {
+        MERGE, BUILD
+    };
 
-	private Operation operation;
-	private BitbucketPullRequestResponseValue pullRequest;
-	private BitbucketUser commentAuthor;
-	private String comment;
+    private Operation operation;
+    private BitbucketPullRequestResponseValue pullRequest;
+    private BitbucketUser commentAuthor;
+    private String comment;
 
-	public BitbucketPullRequest(Operation Operation,
-			BitbucketPullRequestResponseValue pullRequest,
-			BitbucketUser commentAuthor, String comment) {
-		this.operation = Operation;
-		this.pullRequest = pullRequest;
-		this.commentAuthor = commentAuthor;
-		this.comment = comment;
-	}
+    public BitbucketPullRequest(Operation Operation, BitbucketPullRequestResponseValue pullRequest,
+        BitbucketUser commentAuthor, String comment) {
+        this.operation = Operation;
+        this.pullRequest = pullRequest;
+        this.commentAuthor = commentAuthor;
+        this.comment = comment;
+    }
 
-	public Operation getOperation() {
-		return operation;
-	}
+    public Operation getOperation() {
+        return operation;
+    }
 
-	public BitbucketPullRequestResponseValue getPullRequest() {
-		return pullRequest;
-	}
+    public BitbucketPullRequestResponseValue getPullRequest() {
+        return pullRequest;
+    }
 
-	public BitbucketUser getCommentAuthor() {
-		return commentAuthor;
-	}
+    public BitbucketUser getCommentAuthor() {
+        return commentAuthor;
+    }
 
-	public String getComment() {
-		return comment;
-	}
+    public String getComment() {
+        return comment;
+    }
 
-	@Override
-	public String toString() {
-		return new StringBuilder("BitbucketPullRequest [operation=")
-				.append(operation).append(", pullRequest=").append(pullRequest)
-				.append(", commentAuthor=").append(commentAuthor)
-				.append(", comment=").append(comment).append("]").toString();
-	}
+    @Override
+    public String toString() {
+        return new StringBuilder("BitbucketPullRequest [operation=").append(operation).append(", pullRequest=")
+            .append(pullRequest).append(", commentAuthor=").append(commentAuthor).append(", comment=").append(comment)
+            .append("]").toString();
+    }
 }
