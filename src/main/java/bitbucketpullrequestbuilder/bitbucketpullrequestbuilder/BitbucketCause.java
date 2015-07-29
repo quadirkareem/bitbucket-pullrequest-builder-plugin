@@ -2,13 +2,14 @@ package bitbucketpullrequestbuilder.bitbucketpullrequestbuilder;
 
 import hudson.model.Cause;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by nishio
  */
 public class BitbucketCause extends Cause {
-    private static final Logger logger = Logger.getLogger(BitbucketCause.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(BitbucketCause.class.getName());
     private final String sourceBranch;
     private final String targetBranch;
     private final String repositoryOwner;
@@ -25,19 +26,13 @@ public class BitbucketCause extends Cause {
     public BitbucketCause(String sourceBranch, String targetBranch, String repositoryOwner, String repositoryName,
         String pullRequestId, String destinationRepositoryOwner, String destinationRepositoryName,
         String pullRequestTitle, String sourceCommitHash, String destinationCommitHash, String buildStartCommentId) {
-        if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-            BitbucketPluginLogger
-                .debug(
-                    logger,
-                    String
-                        .format(
-                            "INIT: sourceBranch=%s, targetBranch=%s, repositoryOwner=%s,"
-                            + " repositoryName=%s, pullRequestId=%s, destinationRepositoryOwner=%s,"
-                            + " destinationRepositoryName=%s, pullRequestTitle=%s, sourceCommitHash=%s,"
-                            + " destinationCommitHash=%s, buildStartCommentId=%s",
-                            sourceBranch, targetBranch, repositoryOwner, repositoryName, pullRequestId,
-                            destinationRepositoryOwner, destinationRepositoryName, pullRequestTitle, sourceCommitHash,
-                            destinationCommitHash, buildStartCommentId));
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("INIT: sourceBranch={}, targetBranch={}, repositoryOwner={},"
+                + " repositoryName={}, pullRequestId={}, destinationRepositoryOwner={},"
+                + " destinationRepositoryName={}, pullRequestTitle={}, sourceCommitHash={},"
+                + " destinationCommitHash={}, buildStartCommentId={}", new Object[] { sourceBranch, targetBranch,
+                repositoryOwner, repositoryName, pullRequestId, destinationRepositoryOwner, destinationRepositoryName,
+                pullRequestTitle, sourceCommitHash, destinationCommitHash, buildStartCommentId });
         }
         this.sourceBranch = sourceBranch;
         this.targetBranch = targetBranch;
@@ -53,57 +48,57 @@ public class BitbucketCause extends Cause {
     }
 
     public String getSourceBranch() {
-        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, sourceBranch);
+        LOG.debug("sourceBranch={}", sourceBranch);
         return sourceBranch;
     }
 
     public String getTargetBranch() {
-        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, targetBranch);
+        LOG.debug("targetBranch={}", targetBranch);
         return targetBranch;
     }
 
     public String getRepositoryOwner() {
-        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, repositoryOwner);
+        LOG.debug("repositoryOwner={}", repositoryOwner);
         return repositoryOwner;
     }
 
     public String getRepositoryName() {
-        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, repositoryName);
+        LOG.debug("repositoryName={}", repositoryName);
         return repositoryName;
     }
 
     public String getPullRequestId() {
-        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, pullRequestId);
+        LOG.debug("pullRequestId={}", pullRequestId);
         return pullRequestId;
     }
 
     public String getDestinationRepositoryOwner() {
-        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, destinationRepositoryOwner);
+        LOG.debug("destinationRepositoryOwner={}", destinationRepositoryOwner);
         return destinationRepositoryOwner;
     }
 
     public String getDestinationRepositoryName() {
-        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, destinationRepositoryName);
+        LOG.debug("destinationRepositoryName={}", destinationRepositoryName);
         return destinationRepositoryName;
     }
 
     public String getPullRequestTitle() {
-        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, pullRequestTitle);
+        LOG.debug("pullRequestTitle={}", pullRequestTitle);
         return pullRequestTitle;
     }
 
     public String getSourceCommitHash() {
-        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, sourceCommitHash);
+        LOG.debug("sourceCommitHash={}", sourceCommitHash);
         return sourceCommitHash;
     }
 
     public String getDestinationCommitHash() {
-        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, destinationCommitHash);
+        LOG.debug("destinationCommitHash={}", destinationCommitHash);
         return destinationCommitHash;
     }
 
     public String getBuildStartCommentId() {
-        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, buildStartCommentId);
+        LOG.debug("buildStartCommentId={}", buildStartCommentId);
         return buildStartCommentId;
     }
 
@@ -112,7 +107,7 @@ public class BitbucketCause extends Cause {
         String description = "<a href=" + BITBUCKET_URL + this.getDestinationRepositoryOwner() + "/";
         description += this.getDestinationRepositoryName() + "/pull-request/" + this.getPullRequestId();
         description += ">#" + this.getPullRequestId() + " " + this.getPullRequestTitle() + "</a>";
-        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, description);
+        LOG.debug("description={}", description);
         return description;
     }
 

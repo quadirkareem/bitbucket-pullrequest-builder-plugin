@@ -2,45 +2,44 @@ package bitbucketpullrequestbuilder.bitbucketpullrequestbuilder;
 
 import hudson.model.Cause;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by quadirkareem
  */
 public class TriggerJobCause extends Cause {
-    private static final Logger logger = Logger.getLogger(TriggerJobCause.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(TriggerJobCause.class.getName());
     private final String upstreamJob;
     private final String pullRequestId;
     private final String requestedBy;
 
     public TriggerJobCause(String upstreamJob, String pullRequestId, String requestedBy) {
-        if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-            logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format("INIT: upstreamJob=%s, pullRequestId=%s, requestedBy=%s",
-                upstreamJob, pullRequestId, requestedBy));
-        }
+        LOG.debug("INIT: upstreamJob=%s, pullRequestId=%s, requestedBy=%s", new Object[] { upstreamJob, pullRequestId,
+            requestedBy });
         this.upstreamJob = upstreamJob;
         this.pullRequestId = pullRequestId;
         this.requestedBy = requestedBy;
     }
 
     public String getSourceBranch() {
-        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, upstreamJob);
+        LOG.debug("upstreamJob={}", upstreamJob);
         return upstreamJob;
     }
 
     public String getPullRequestId() {
-        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, pullRequestId);
+        LOG.debug("pullRequestId={}", pullRequestId);
         return pullRequestId;
     }
 
     public String getRequestedBy() {
-        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, requestedBy);
+        LOG.debug("requestedBy={}", requestedBy);
         return requestedBy;
     }
 
     @Override
     public String getShortDescription() {
-        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, toString());
+        LOG.debug("shortDescription={}", toString());
         return toString();
     }
 

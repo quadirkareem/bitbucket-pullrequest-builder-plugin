@@ -5,31 +5,28 @@ import hudson.model.AbstractBuild;
 import hudson.model.Cause;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import jenkins.model.Jenkins;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by nishio
  */
 public class BitbucketBuilds {
-    private static final Logger logger = Logger.getLogger(BitbucketBuilds.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(BitbucketBuilds.class.getName());
     private BitbucketBuildTrigger trigger;
     private BitbucketRepository repository;
 
     public BitbucketBuilds(BitbucketBuildTrigger trigger, BitbucketRepository repository) {
-        if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-            logger.log(BitbucketPluginLogger.LEVEL_DEBUG, "INIT");
-        }
+        LOG.debug("Initialising BitbucketBuilds Instance");
         this.trigger = trigger;
         this.repository = repository;
     }
 
     public BitbucketCause getCause(AbstractBuild build) {
-        if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-            logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format("build displayName=%s", build.getDisplayName()));
-        }
+        LOG.debug("build displayName={}", build.getDisplayName());
         Cause cause = build.getCause(BitbucketCause.class);
         if (cause == null || !(cause instanceof BitbucketCause)) {
             return null;
@@ -38,10 +35,7 @@ public class BitbucketBuilds {
     }
 
     public void onStarted(AbstractBuild build) {
-        if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-            logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format("build displayName=%s", build.getDisplayName()));
-        }
-
+        LOG.debug("build displayName={}", build.getDisplayName());
         BitbucketCause cause = this.getCause(build);
         if (cause == null) {
             return;
@@ -50,14 +44,12 @@ public class BitbucketBuilds {
             build.setDescription(cause.getShortDescription());
         }
         catch (IOException e) {
-            logger.log(Level.SEVERE, "Can't update build description", e);
+            LOG.error("Can't update build description", e);
         }
     }
 
     public void onCompleted(AbstractBuild build) {
-        if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-            logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format("build displayName=%s", build.getDisplayName()));
-        }
+        LOG.debug("build displayName={}", build.getDisplayName());
         BitbucketCause cause = this.getCause(build);
         if (cause == null) {
             return;

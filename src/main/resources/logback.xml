@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="false">
+
+	<!-- ************************************************** -->
+	<!-- PROPERTIES -->
+
+	<!-- default log level is debug -->
+	<property name="defaultLevel" value="debug"
+		scope="system" />
+
+	<!-- log to files by default -->
+	<property name="defaultAppender" value="${logfiles}"
+		scope="system" />
+
+	<property name="logdir" value="${JENKINS_HOME:-/var/log}/bitprb" scope="system" />
+
+	<property name="defaultPattern"
+		value="%-30(%d{MM/dd/yyyy HH:mm:ss.SSS} [%thread - %X{mdcString}]) %-5level %logger{32} - %msg%n"
+		scope="system" />
+
+
+	<!-- ************************************************** -->
+	<!-- APPENDERS -->
+
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${defaultPattern}</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="logfiles"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>${logdir}/bitprb.log</File>
+		<encoder>
+			<pattern>${defaultPattern}</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<maxIndex>10</maxIndex>
+			<FileNamePattern>${logdir}/bitprb.log.%i.gz</FileNamePattern>
+		</rollingPolicy>
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<maxFileSize>10MB</maxFileSize>
+		</triggeringPolicy>
+	</appender>
+
+
+    <!-- ************************************************** -->
+    <!-- LOGGERS -->
+<!--
+	<logger name="bitbucketpullrequestbuilder.bitbucketpullrequestbuilder" additivity="false" level="debug">
+		<appender-ref ref="${defaultAppender}" />
+	</logger>
+-->
+
+	<!-- ************************************************** -->
+	<!-- ROOT -->
+
+	<root level="${defaultLevel}">
+		<appender-ref ref="${defaultAppender}" />
+	</root>
+
+</configuration>

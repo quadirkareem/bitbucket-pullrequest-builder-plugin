@@ -3,8 +3,6 @@ package bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.bitbucket;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
@@ -21,15 +19,15 @@ import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonToken;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
-
-import bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.BitbucketPluginLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by nishio
  */
 public class BitbucketApiClient {
-    private static final Logger logger = Logger.getLogger(BitbucketApiClient.class.getName());
-    private static final String BITBUCKET_HOST = "bitbucket.org";
+    private static final Logger LOG = LoggerFactory.getLogger(BitbucketApiClient.class.getName());
+    // private static final String BITBUCKET_HOST = "bitbucket.org";
     private static final String V1_API_BASE_URL = "https://bitbucket.org/api/1.0/repositories/";
     private static final String V2_API_BASE_URL = "https://bitbucket.org/api/2.0/repositories/";
     private final JsonFactory jsonFactory = new JsonFactory();
@@ -47,40 +45,29 @@ public class BitbucketApiClient {
 
     public List<BitbucketPullRequestResponseValue> getPullRequests() {
         try {
-            if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format("Invoking Http Request %s", pullRequestsUrl));
-            }
+            LOG.debug("Invoking Http Request {}", pullRequestsUrl);
             String response = getRequest(pullRequestsUrl);
-            if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format("Response for %s:\n%s", pullRequestsUrl, response));
-            }
+            LOG.debug("Response for {}:\n{}", pullRequestsUrl, response);
             return parsePullRequestJson(response).getPrValues();
         }
         catch (Exception e) {
-            logger.log(Level.WARNING, "Error while getting Pull Requests or parsing response", e);
+            LOG.error("Error while getting Pull Requests or parsing response", e);
         }
         return null;
     }
 
     public List<BitbucketPullRequestComment> getPullRequestComments(String pullRequestId) {
-        String pullRequestCommentsUrl = getRequest(V1_API_BASE_URL + this.owner + "/" + this.repositoryName
-            + "/pullrequests/" + pullRequestId + "/comments");
+        String pullRequestCommentsUrl = V1_API_BASE_URL + this.owner + "/" + this.repositoryName + "/pullrequests/"
+            + pullRequestId + "/comments";
         try {
-            if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format("Invoking Http Request %s", pullRequestCommentsUrl));
-            }
+            LOG.debug("Invoking Http Request {}", pullRequestCommentsUrl);
             String response = getRequest(pullRequestCommentsUrl);
-            if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                logger.log(BitbucketPluginLogger.LEVEL_DEBUG,
-                    String.format("Response for %s:\n%s", pullRequestCommentsUrl, response));
-            }
+            LOG.debug("Response for {}:\n{}", pullRequestCommentsUrl, response);
             return parseCommentJson(response);
         }
         catch (Exception e) {
-            logger
-                .log(Level.WARNING, String
-                    .format("Error while getting Pull Request Comments or parsing response for pullRequestId=%s",
-                        pullRequestId), e);
+            LOG.error("Error while getting Pull Request Comments or parsing response for pullRequestId={}",
+                pullRequestId, e);
         }
         return null;
     }
@@ -90,16 +77,12 @@ public class BitbucketApiClient {
         String deletePullRequestCommentUrl = V1_API_BASE_URL + this.owner + "/" + this.repositoryName
             + "/pullrequests/" + pullRequestId + "/comments/" + commentId;
         try {
-            if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                logger.log(BitbucketPluginLogger.LEVEL_DEBUG,
-                    String.format("Invoking Http Request %s", deletePullRequestCommentUrl));
-            }
+            LOG.debug("Invoking Http Request {}", deletePullRequestCommentUrl);
             deleteRequest(deletePullRequestCommentUrl);
         }
         catch (Exception e) {
-            logger.log(Level.WARNING, String.format(
-                "Error while deleting Pull Request comment for pullRequestId=%s, commentId=%s", pullRequestId,
-                commentId), e);
+            LOG.error("Error while deleting Pull Request comment for pullRequestId={}, commentId={}", pullRequestId,
+                commentId, e);
         }
     }
 
@@ -110,26 +93,19 @@ public class BitbucketApiClient {
         String errorMessage = null;
         String response = null;
         try {
-            if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format("Invoking Http Request %s", mergePullRequestUrl));
-            }
+            LOG.debug("Invoking Http Request {}", mergePullRequestUrl);
             NameValuePair content = new NameValuePair("message", message);
             NameValuePair closeSourceBranchNVP = new NameValuePair("close_source_branch",
                 Boolean.toString(closeSourceBranch));
             response = postRequest(mergePullRequestUrl, new NameValuePair[] { content, closeSourceBranchNVP });
-            if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                logger.log(BitbucketPluginLogger.LEVEL_DEBUG,
-                    String.format("Response for %s:\n%s", mergePullRequestUrl, response));
-            }
+            LOG.debug("Response for {}:\n{}", mergePullRequestUrl, response);
             errorMessage = parseMergeResponseJson(response);
         }
         catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         catch (Exception e) {
-            logger.log(Level.WARNING,
-                String.format("Error while Merging Pull Request or parsing response pullRequestId=%s", pullRequestId),
-                e);
+            LOG.error("Error while Merging Pull Request or parsing response pullRequestId={}", pullRequestId, e);
         }
 
         return errorMessage;
@@ -140,17 +116,11 @@ public class BitbucketApiClient {
         String declinePullRequestUrl = V2_API_BASE_URL + this.owner + "/" + this.repositoryName + "/pullrequests/"
             + pullRequestId + "/decline";
         try {
-            if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format("Invoking Http Request %s", declinePullRequestUrl));
-            }
+            LOG.debug("Invoking Http Request {}", declinePullRequestUrl);
             postRequest(declinePullRequestUrl, null);
         }
-        catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
         catch (Exception e) {
-            logger.log(Level.WARNING,
-                String.format("Error while Declining Pull Request pullRequestId=%s", pullRequestId), e);
+            LOG.error("Error while Declining Pull Request pullRequestId={}", pullRequestId, e);
         }
     }
 
@@ -158,63 +128,41 @@ public class BitbucketApiClient {
         String postPullRequestCommentUrl = V1_API_BASE_URL + this.owner + "/" + this.repositoryName + "/pullrequests/"
             + pullRequestId + "/comments";
         try {
-            if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                logger.log(BitbucketPluginLogger.LEVEL_DEBUG,
-                    String.format("Invoking Http Request %s", postPullRequestCommentUrl));
-            }
+            LOG.debug("Invoking Http Request {}", postPullRequestCommentUrl);
             NameValuePair content = new NameValuePair("content", comment);
             String response = postRequest(postPullRequestCommentUrl, new NameValuePair[] { content });
-            if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-                logger.log(BitbucketPluginLogger.LEVEL_DEBUG,
-                    String.format("Response for %s:\n%s", postPullRequestCommentUrl, response));
-            }
+            LOG.debug("Response for {}:\n{}", postPullRequestCommentUrl, response);
             return parseSingleCommentJson(response);
         }
-        catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        catch (IOException e) {
-            logger.log(Level.WARNING, String.format(
-                "Error while PostingPull Request Comment or parsing response pullRequestId=%s, comment=%s",
-                pullRequestId, comment), e);
+        catch (Exception e) {
+            LOG.error("Error while PostingPull Request Comment or parsing response pullRequestId={}, comment={}",
+                pullRequestId, comment, e);
         }
         return null;
     }
 
-    private String getRequest(String path) {
+    private String getRequest(String path) throws HttpException, IOException {
         HttpClient client = new HttpClient();
         client.getState().setCredentials(AuthScope.ANY, credentials);
         GetMethod httpget = new GetMethod(path);
         client.getParams().setAuthenticationPreemptive(true);
         String response = null;
-        try {
-            client.executeMethod(httpget);
-            response = httpget.getResponseBodyAsString();
-        }
-        catch (HttpException e) {
-            e.printStackTrace();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+        client.executeMethod(httpget);
+        response = httpget.getResponseBodyAsString();
+
         return response;
     }
 
-    private void deleteRequest(String path) {
+    private void deleteRequest(String path) throws HttpException, IOException {
         HttpClient client = new HttpClient();
         client.getState().setCredentials(AuthScope.ANY, credentials);
         DeleteMethod httppost = new DeleteMethod(path);
         client.getParams().setAuthenticationPreemptive(true);
         String response = "";
-        try {
-            client.executeMethod(httppost);
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+        client.executeMethod(httppost);
     }
 
-    private String postRequest(String path, NameValuePair[] params) throws UnsupportedEncodingException {
+    private String postRequest(String path, NameValuePair[] params) throws HttpException, IOException {
         HttpClient client = new HttpClient();
         client.getState().setCredentials(AuthScope.ANY, credentials);
         PostMethod httppost = new PostMethod(path);
@@ -223,23 +171,12 @@ public class BitbucketApiClient {
         }
         client.getParams().setAuthenticationPreemptive(true);
         String response = "";
-        try {
-            client.executeMethod(httppost);
-            response = httppost.getResponseBodyAsString();
-            logger.finer("API Request Response: " + response);
-        }
-        catch (HttpException e) {
-            e.printStackTrace();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+        client.executeMethod(httppost);
+        response = httppost.getResponseBodyAsString();
         return response;
-
     }
 
     private BitbucketPullRequestResponse parsePullRequestJson(String response) throws IOException {
-        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, "parsePullRequestJson():\n" + response);
         ObjectMapper mapper = new ObjectMapper();
         BitbucketPullRequestResponse parsedResponse;
         parsedResponse = mapper.readValue(response, BitbucketPullRequestResponse.class);
@@ -247,7 +184,6 @@ public class BitbucketApiClient {
     }
 
     private List<BitbucketPullRequestComment> parseCommentJson(String response) throws IOException {
-        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, "parseCommentJson():\n" + response);
         ObjectMapper mapper = new ObjectMapper();
         List<BitbucketPullRequestComment> parsedResponse;
         parsedResponse = mapper.readValue(response, new TypeReference<List<BitbucketPullRequestComment>>() {});
@@ -255,7 +191,6 @@ public class BitbucketApiClient {
     }
 
     private BitbucketPullRequestComment parseSingleCommentJson(String response) throws IOException {
-        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, "parseSingleCommentJson():\n" + response);
         ObjectMapper mapper = new ObjectMapper();
         BitbucketPullRequestComment parsedResponse;
         parsedResponse = mapper.readValue(response, BitbucketPullRequestComment.class);
@@ -263,7 +198,6 @@ public class BitbucketApiClient {
     }
 
     private String parseMergeResponseJson(String response) throws IOException {
-        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, "parseMergeResponseJson():\n" + response);
         ObjectMapper mapper = new ObjectMapper();
         BitbucketPullRequestResponseValue parsedResponse;
         parsedResponse = mapper.readValue(response, BitbucketPullRequestResponseValue.class);
@@ -275,7 +209,6 @@ public class BitbucketApiClient {
     }
 
     private String parseErrorMessageJson(String response) throws IOException {
-        logger.log(BitbucketPluginLogger.LEVEL_DEBUG, "parseErrorMessageJson():\n" + response);
         String errorMessage = null;
         JsonParser parser = jsonFactory.createJsonParser(response);
         ObjectMapper mapper = new ObjectMapper();

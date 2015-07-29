@@ -5,22 +5,21 @@ import hudson.model.TaskListener;
 import hudson.model.AbstractBuild;
 import hudson.model.listeners.RunListener;
 
-import java.util.logging.Logger;
-
 import javax.annotation.Nonnull;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by nishio
  */
 @Extension
 public class BitbucketBuildListener extends RunListener<AbstractBuild> {
-    private static final Logger logger = Logger.getLogger(BitbucketBuildListener.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(BitbucketBuildListener.class.getName());
 
     @Override
     public void onStarted(AbstractBuild abstractBuild, TaskListener listener) {
-        if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-            logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format("build displayName=%s", abstractBuild.getDisplayName()));
-        }
+        LOG.debug("build displayName={}", abstractBuild.getDisplayName());
         // logger.info("BuildListener onStarted called.");
         BitbucketBuildTrigger trigger = BitbucketBuildTrigger.getTrigger(abstractBuild.getProject());
         if (trigger == null) {
@@ -31,9 +30,7 @@ public class BitbucketBuildListener extends RunListener<AbstractBuild> {
 
     @Override
     public void onCompleted(AbstractBuild abstractBuild, @Nonnull TaskListener listener) {
-        if (logger.isLoggable(BitbucketPluginLogger.LEVEL_DEBUG)) {
-            logger.log(BitbucketPluginLogger.LEVEL_DEBUG, String.format("build displayName=%s", abstractBuild.getDisplayName()));
-        }
+        LOG.debug("build displayName={}", abstractBuild.getDisplayName());
         BitbucketBuildTrigger trigger = BitbucketBuildTrigger.getTrigger(abstractBuild.getProject());
         if (trigger == null) {
             return;
