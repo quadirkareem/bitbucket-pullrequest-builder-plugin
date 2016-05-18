@@ -87,13 +87,16 @@ public class BitbucketRepository {
     public Collection<BitbucketPullRequest> getTargetPullRequests() {
         List<BitbucketPullRequestResponseValue> pullRequests = client.getPullRequests();
         List<BitbucketPullRequest> targetPullRequests = new ArrayList<BitbucketPullRequest>();
-        LOG.info("job={} => Total Pull Requests fetched={}", buildName, pullRequests.size());
         if (pullRequests != null && pullRequests.size() > 0) {
+            LOG.info("job={} => Total Pull Requests fetched={}", buildName, pullRequests.size());
             for (BitbucketPullRequestResponseValue pullRequest : pullRequests) {
                 filterPullRequest(targetPullRequests, pullRequest);
             }
+            LOG.info("job={} => Total Pull Requests post filtering={}", buildName, targetPullRequests.size());
         }
-        LOG.info("job={} => Total Pull Requests post filtering={}", buildName, targetPullRequests.size());
+        else {
+            LOG.error("job={} => Pull Requests is NULL", buildName);
+        }
         return targetPullRequests;
     }
 
